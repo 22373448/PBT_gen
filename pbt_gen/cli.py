@@ -7,7 +7,7 @@ from pathlib import Path
 from .config import AppConfig, LLMConfig, PBTConfig, ProjectConfig
 from .llm_client import OpenAILLMClient
 from .pbt_generator import PBTOrchestrator
-from .vector_store import DummyVectorStore
+from .vector_store import ChromaVectorStore
 from .function_finder import collect_functions, filter_functions_by_module_paths
 
 
@@ -60,29 +60,43 @@ async def main_async() -> None:
 
     llm_client = OpenAILLMClient(app_config.llm)
 
-    # TODO: replace DummyVectorStore with your real implementation and indexing pipeline.
-    vector_store = DummyVectorStore(documents=[])
-
+    # 首先构建 orchestrator（暂时不带检索）
     orchestrator = PBTOrchestrator(
         config=app_config,
         llm_client=llm_client,
-        vector_store=vector_store,
+        vector_store=None,
     )
 
     project_tree, all_files, all_functions = orchestrator.scan_project()
+
+    # 使用函数源码构建基于 chromadb 的向量检索索引
+    vector_store = ChromaVectorStore(collection_name="pbt_gen_functions")
+    docs = []
+    for fn in all_functions:
+        docs.append(
+            {
+                "id": fn.module_path,
+                "content": fn.source,
+                "metadata": {
+                    "module_path": fn.module_path,
+                    "rel_path": str(fn.file.rel_path),
+                },
+            }
+        )
+    vector_store.index_documents(docs)
+    orchestrator.vector_store = vector_store
 
     selected_functions = filter_functions_by_module_paths(
         all_functions, target_module_paths=target_functions
     )
 
-    print("Project file tree (macOS style):")
-    print(project_tree)
-    print()
-    print(f"Discovered {len(all_functions)} functions/methods; "
-          f"{len(selected_functions)} selected as targets.")
+    print(
+        f"Discovered {len(all_functions)} functions/methods; "
+        f"{len(selected_functions)} selected as targets."
+    )
 
-    for fn in selected_functions:
-        print(f"\n=== Processing target function: {fn.module_path} ===")
+    for index, fn in enumerate(selected_functions):
+        print(f"\n=== Processing target function #{index}: {fn.module_path} ===")
 
         # Step 3: file selection & signals
         selection = await orchestrator.select_related_files_for_function(
@@ -103,6 +117,7 @@ async def main_async() -> None:
             target_fn=fn,
             signals_files=signals_files,
             signals_retrieval=signals_retrieval,
+            index=index,
         )
 
         print(f"Generated PBT module for {fn.module_path}: {pbt_result.test_module_path}")

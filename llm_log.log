@@ -1,0 +1,961 @@
+2025-11-26T23:20:11Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        Your task is to identify source files that are semantically related to
+        the following target function, with a focus on properties, invariants,
+        and cross-function relationships that are useful for **property-based testing (PBT)**.
+
+        ## STRICT REQUIREMENT ABOUT METADATA
+        - For every file / function / class / method you mention, ALWAYS include its
+          **Python module path** metadata (e.g. `package.module`, `package.module.Class.method`).
+        - This metadata must be sufficient to import the symbol from test code.
+
+        ## Project file tree (macOS style)
+        example_project
+└── pkg
+    ├── subpkg
+    │   ├── __init__.py
+    │   └── module_b.py
+    ├── __init__.py
+    └── module_a.py
+
+        ## All Python files (with module paths)
+        - pkg/module_a.py  (module_path=pkg.module_a)
+- pkg/__init__.py  (module_path=pkg.__init__)
+- pkg/subpkg/module_b.py  (module_path=pkg.subpkg.module_b)
+- pkg/subpkg/__init__.py  (module_path=pkg.subpkg.__init__)
+
+        ## Target function (with module path metadata)
+        - module_path: `pkg.module_a.Encoder.encode`
+        - defined in file: `pkg/module_a.py`
+        - source code:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Your goals
+        1. Select **top 10 source files** that are most likely to contain:
+           - inverse operations (e.g. encode/decode, serialize/deserialize)
+           - validation or checking logic
+           - invariants / consistency checks
+           - higher-level orchestration that relies on the target function
+           - alternative implementations with the same behavior
+        2. For each selected file, explain **why** it is related from a property/testing perspective.
+        3. For each selected file, list notable **functions/classes/methods** (with module paths)
+           that might be important when generating PBTs.
+
+        ## Output format (MUST be valid JSON)
+        Return a JSON object with the following shape:
+
+        {
+          "target_function_module_path": "<string>",
+          "selected_files": [
+            {
+              "rel_path": "<relative/path/to/file.py>",
+              "module_path": "<python.module.path>",
+              "reason": "<why this file is related>",
+              "notable_symbols": [
+                {
+                  "name": "<symbol name>",
+                  "kind": "function|class|method",
+                  "module_path": "<python.module.path.for.this.symbol>",
+                  "role_for_pbt": "<how this helps define properties/invariants>"
+                }
+              ]
+            }
+          ]
+        }
+
+        Do not include any comments outside JSON. Do not use trailing commas.
+2025-11-26T23:20:41Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+```json
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "selected_files": [
+    {
+      "rel_path": "pkg/module_a.py",
+      "module_path": "pkg.module_a",
+      "reason": "Contains the Encoder class and potentially inverse operations like decode, validation methods, or related encoding logic",
+      "notable_symbols": [
+        {
+          "name": "Encoder",
+          "kind": "class",
+          "module_path": "pkg.module_a.Encoder",
+          "role_for_pbt": "Main class containing encode method; may have decode method for round-trip properties"
+        },
+        {
+          "name": "Encoder.decode",
+          "kind": "method",
+          "module_path": "pkg.module_a.Encoder.decode",
+          "role_for_pbt": "Potential inverse operation for encode/decode round-trip property testing"
+        },
+        {
+          "name": "Encoder.validate",
+          "kind": "method",
+          "module_path": "pkg.module_a.Encoder.validate",
+          "role_for_pbt": "Validation logic that could define pre/post conditions for encode"
+        }
+      ]
+    },
+    {
+      "rel_path": "pkg/subpkg/module_b.py",
+      "module_path": "pkg.subpkg.module_b",
+      "reason": "May contain alternative encoder implementations, decoder classes, or validation utilities",
+      "notable_symbols": [
+        {
+          "name": "Decoder",
+          "kind": "class",
+          "module_path": "pkg.subpkg.module_b.Decoder",
+          "role_for_pbt": "Inverse operation class for encode/decode round-trip testing"
+        },
+        {
+          "name": "AlternativeEncoder",
+          "kind": "class",
+          "module_path": "pkg.subpkg.module_b.AlternativeEncoder",
+          "role_for_pbt": "Alternative implementation for equivalence property testing"
+        },
+        {
+          "name": "validate_encoding",
+          "kind": "function",
+          "module_path": "pkg.subpkg.module_b.validate_encoding",
+          "role_for_pbt": "Validation function defining encoding invariants"
+        }
+      ]
+    },
+    {
+      "rel_path": "pkg/__init__.py",
+      "module_path": "pkg",
+      "reason": "Package initialization may expose encoder/decoder APIs or define module relationships",
+      "notable_symbols": [
+        {
+          "name": "Encoder",
+          "kind": "class",
+          "module_path": "pkg.Encoder",
+          "role_for_pbt": "Re-exported encoder for API-level property testing"
+        },
+        {
+          "name": "get_default_encoder",
+          "kind": "function",
+          "module_path": "pkg.get_default_encoder",
+          "role_for_pbt": "Factory function for encoder instances with different configurations"
+        }
+      ]
+    },
+    {
+      "rel_path": "pkg/subpkg/__init__.py",
+      "module_path": "pkg.subpkg",
+      "reason": "Subpackage initialization may expose decoder utilities or encoding-related functions",
+      "notable_symbols": [
+        {
+          "name": "Decoder",
+          "kind": "class",
+          "module_path": "pkg.subpkg.Decoder",
+          "role_for_pbt": "Re-exported decoder for cross-module round-trip testing"
+        },
+        {
+          "name": "encoding_utils",
+          "kind": "function",
+          "module_path": "pkg.subpkg.encoding_utils",
+          "role_for_pbt": "Utility functions defining encoding invariants or constraints"
+        }
+      ]
+    }
+  ]
+}
+```
+2025-11-26T23:20:41Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert in property-based testing for Python.
+You are given:
+- A target function (with module path metadata).
+- The full source code of several **related files** picked by another agent.
+
+Your job is to extract structured information that will help generate
+high-quality **cross-function PBTs**.
+
+## STRICT REQUIREMENT ABOUT METADATA
+- Every time you refer to a function/class/method, you MUST include its
+  full Python **module path** in the output.
+- This metadata must be sufficient for importing in tests.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Related files (with source)
+
+
+## Your goals
+For the target function, infer:
+- **Invariants**: properties that should always hold about inputs/outputs/state.
+- **Preconditions**: assumptions that must hold for the function to behave correctly.
+- **Postconditions**: guarantees about outputs or state after the function returns.
+- **Cross-function relationships**: how this function interacts with other functions,
+  such as encode/decode pairs, round-trips, consistency with validators, etc.
+- **Examples**: a few concrete input/output or usage examples that illustrate the above.
+
+## Output format (MUST be valid JSON)
+Return a JSON object:
+
+{
+  "target_function_module_path": "<string>",
+  "description": "<high-level description of the function's behavior and role>",
+  "invariants": ["<string>", "..."],
+  "preconditions": ["<string>", "..."],
+  "postconditions": ["<string>", "..."],
+  "relationships": [
+    {
+      "description": "<relation, e.g. encode/decode round-trip>",
+      "related_symbol_module_path": "<python.module.path>",
+      "kind": "function|class|method"
+    }
+  ],
+  "examples": ["<example 1>", "<example 2>", "..."]
+}
+
+Do not include any comments outside JSON. Do not use trailing commas.
+2025-11-26T23:20:52Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+```json
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "description": "Converts a string to uppercase encoding",
+  "invariants": ["Output string length equals input string length", "Output contains only uppercase characters", "Encoding is idempotent (encode(encode(x)) == encode(x))"],
+  "preconditions": ["Input must be a string", "Input should not be None"],
+  "postconditions": ["Output is always a string", "Output is uppercase version of input", "Output preserves non-alphabetic characters unchanged"],
+  "relationships": [
+    {
+      "description": "Potential decode counterpart for round-trip encoding",
+      "related_symbol_module_path": "pkg.module_a.Encoder.decode",
+      "kind": "method"
+    },
+    {
+      "description": "Potential validation function to check encoding correctness",
+      "related_symbol_module_path": "pkg.module_a.Encoder.is_valid_encoding",
+      "kind": "method"
+    },
+    {
+      "description": "Potential alternative encoding method in same class",
+      "related_symbol_module_path": "pkg.module_a.Encoder.encode_alternative",
+      "kind": "method"
+    }
+  ],
+  "examples": ["encode('hello') → 'HELLO'", "encode('Hello123') → 'HELLO123'", "encode('') → ''"]
+}
+```
+2025-11-26T23:20:52Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are assisting with semantic vector search for Python source code
+in order to build cross-function property-based tests (PBT).
+
+## STRICT REQUIREMENT ABOUT METADATA
+- You must restate the target function's module path exactly, as this will be
+  stored as metadata for downstream steps.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Your goal
+Produce a **single natural-language query** that is well-suited for vector
+similarity search to find:
+- potential inverse/dual functions (e.g. encode/decode, serialize/deserialize)
+- callers and callees that impose stronger invariants
+- validators or checkers enforcing constraints related to this function
+- alternative implementations with same behavior
+
+The query should:
+- Be descriptive and self-contained (no references like "the function above").
+- Emphasize properties, invariants, and relationships over concrete variable names.
+
+## Output format (MUST be valid JSON)
+Return:
+
+{
+  "target_function_module_path": "<string>",
+  "retrieval_query": "<single natural language query>"
+}
+
+Do not include comments, only JSON.
+2025-11-26T23:20:56Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "retrieval_query": "Functions that transform string data with inverse operations like decode or decrypt, functions that call or are called by string transformation logic, validation functions that check string properties before or after transformation, and alternative implementations that convert strings to uppercase or perform similar case normalization operations."
+}
+2025-11-26T23:20:57Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert in property-based testing for Python.
+        You are given:
+        - A target function.
+        - A semantic search query.
+        - A set of code/documentation snippets retrieved by vector search.
+
+        ## STRICT REQUIREMENT ABOUT METADATA
+        - Each time you reference a symbol from the retrieved snippets, you must include
+          its `module_path` metadata exactly as provided (or inferred if clearly implied).
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Retrieval query
+        Functions that transform string data with inverse operations like decode or decrypt, functions that call or are called by string transformation logic, validation functions that check string properties before or after transformation, and alternative implementations that convert strings to uppercase or perform similar case normalization operations.
+
+        ## Retrieval hits
+        ### Hit 0
+- module_path: pkg.module_a.Encoder.encode
+- rel_path: pkg/module_a.py
+- metadata: {'module_path': 'pkg.module_a.Encoder.encode', 'rel_path': 'pkg/module_a.py'}
+```python
+    def encode(self, value: str) -> str:
+        return value.upper()
+```
+
+### Hit 1
+- module_path: pkg.subpkg.module_b.mul
+- rel_path: pkg/subpkg/module_b.py
+- metadata: {'module_path': 'pkg.subpkg.module_b.mul', 'rel_path': 'pkg/subpkg/module_b.py'}
+```python
+def mul(x: int, y: int) -> int:
+    """Another simple function for discovery tests."""
+    return x * y
+```
+
+### Hit 2
+- module_path: pkg.module_a.add
+- rel_path: pkg/module_a.py
+- metadata: {'module_path': 'pkg.module_a.add', 'rel_path': 'pkg/module_a.py'}
+```python
+def add(x: int, y: int) -> int:
+    """Simple function to test function discovery."""
+    return x + y
+```
+
+        ## Your goals
+        Similar to previous step, but based on retrieval hits:
+        - Infer invariants, preconditions, postconditions, cross-function relationships,
+          and concrete examples that are useful for generating PBTs.
+        - Especially focus on how the target function should behave **in relation to** the
+          retrieved symbols (round-trips, consistency, error handling, etc.).
+
+        ## Output format (MUST be valid JSON)
+
+        {
+          "target_function_module_path": "<string>",
+          "description": "<summary of new insights from retrieval>",
+          "invariants": ["<string>", "..."],
+          "preconditions": ["<string>", "..."],
+          "postconditions": ["<string>", "..."],
+          "relationships": [
+            {
+              "description": "<relation>",
+              "related_symbol_module_path": "<python.module.path>",
+              "kind": "function|class|method"
+            }
+          ],
+          "examples": ["<example 1>", "<example 2>", "..."]
+        }
+
+        Do not include comments, only JSON.
+2025-11-26T23:21:07Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "description": "Retrieval revealed the target function is isolated within its module with no direct inverse operations found. The search identified only unrelated arithmetic functions in the same package, suggesting the encode function operates independently without complementary decode/decrypt functions or validation logic.",
+  "invariants": ["Output string length equals input string length", "Output contains only uppercase characters", "Output is always uppercase regardless of input case"],
+  "preconditions": ["Input must be a string", "Input should not be None"],
+  "postconditions": ["For any input string s, encode(s) == s.upper()", "Output string preserves all non-alphabetic characters unchanged"],
+  "relationships": [
+    {
+      "description": "Located in same module but no functional relationship",
+      "related_symbol_module_path": "pkg.module_a.add",
+      "kind": "function"
+    }
+  ],
+  "examples": ["encode('hello') → 'HELLO'", "encode('Hello123') → 'HELLO123'", "encode('') → ''"]
+}
+2025-11-26T23:21:07Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': '', 'invariants': [], 'preconditions': [], 'postconditions': [], 'relationships': [], 'examples': []}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': 'Retrieval revealed the target function is isolated within its module with no direct inverse operations found. The search identified only unrelated arithmetic functions in the same package, suggesting the encode function operates independently without complementary decode/decrypt functions or validation logic.', 'invariants': ['Output string length equals input string length', 'Output contains only uppercase characters', 'Output is always uppercase regardless of input case'], 'preconditions': ['Input must be a string', 'Input should not be None'], 'postconditions': ['For any input string s, encode(s) == s.upper()', 'Output string preserves all non-alphabetic characters unchanged'], 'relationships': ['Located in same module but no functional relationship'], 'examples': ["encode('hello') → 'HELLO'", "encode('Hello123') → 'HELLO123'", "encode('') → ''"]}
+```
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Keep tests focused but expressive; 2–6 properties per target function is fine.
+
+## Output format
+Return **only** the Python test module code, no backticks, no explanations.
+2025-11-26T23:21:16Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given, assume
+from pkg.module_a import Encoder
+
+
+@given(st.text())
+def test_output_length_equals_input_length(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+
+
+@given(st.text())
+def test_output_is_uppercase(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result.isupper()
+
+
+@given(st.text())
+def test_output_equals_upper_method(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result == value.upper()
+
+
+@given(st.text())
+def test_preserves_non_alphabetic_characters(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for i, char in enumerate(value):
+        if not char.isalpha():
+            assert result[i] == char
+
+
+@given(st.text())
+def test_handles_empty_string(value):
+    assume(value == "")
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result == ""
+2025-11-26T23:24:56Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        Your task is to identify source files that are semantically related to
+        the following target function, with a focus on properties, invariants,
+        and cross-function relationships that are useful for **property-based testing (PBT)**.
+
+        ## STRICT REQUIREMENT ABOUT METADATA
+        - For every file / function / class / method you mention, ALWAYS include its
+          **Python module path** metadata (e.g. `package.module`, `package.module.Class.method`).
+        - This metadata must be sufficient to import the symbol from test code.
+
+        ## Project file tree (macOS style)
+        example_project
+└── pkg
+    ├── subpkg
+    │   ├── __init__.py
+    │   └── module_b.py
+    ├── __init__.py
+    └── module_a.py
+
+        ## All Python files (with module paths)
+        - pkg/module_a.py  (module_path=pkg.module_a)
+- pkg/__init__.py  (module_path=pkg.__init__)
+- pkg/subpkg/module_b.py  (module_path=pkg.subpkg.module_b)
+- pkg/subpkg/__init__.py  (module_path=pkg.subpkg.__init__)
+
+        ## Target function (with module path metadata)
+        - module_path: `pkg.module_a.Encoder.encode`
+        - defined in file: `pkg/module_a.py`
+        - source code:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Your goals
+        1. Select **top 10 source files** that are most likely to contain:
+           - inverse operations (e.g. encode/decode, serialize/deserialize)
+           - validation or checking logic
+           - invariants / consistency checks
+           - higher-level orchestration that relies on the target function
+           - alternative implementations with the same behavior
+        2. For each selected file, explain **why** it is related from a property/testing perspective.
+        3. For each selected file, list notable **functions/classes/methods** (with module paths)
+           that might be important when generating PBTs.
+
+        ## Output format (MUST be valid JSON)
+        Return a JSON object with the following shape:
+
+        {
+          "target_function_module_path": "<string>",
+          "selected_files": [
+            {
+              "rel_path": "<relative/path/to/file.py>",
+              "module_path": "<python.module.path>",
+              "reason": "<why this file is related>",
+              "notable_symbols": [
+                {
+                  "name": "<symbol name>",
+                  "kind": "function|class|method",
+                  "module_path": "<python.module.path.for.this.symbol>",
+                  "role_for_pbt": "<how this helps define properties/invariants>"
+                }
+              ]
+            }
+          ]
+        }
+
+        Do not include any comments outside JSON. Do not use trailing commas.
+2025-11-26T23:25:24Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+```json
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "selected_files": [
+    {
+      "rel_path": "pkg/module_a.py",
+      "module_path": "pkg.module_a",
+      "reason": "Contains the target function's class definition and likely related methods like decode or validation logic",
+      "notable_symbols": [
+        {
+          "name": "Encoder",
+          "kind": "class",
+          "module_path": "pkg.module_a.Encoder",
+          "role_for_pbt": "Class containing encode method, may have decode method for round-trip property testing"
+        },
+        {
+          "name": "Encoder.decode",
+          "kind": "method",
+          "module_path": "pkg.module_a.Encoder.decode",
+          "role_for_pbt": "Potential inverse operation for encode/decode round-trip property testing"
+        },
+        {
+          "name": "Encoder.validate",
+          "kind": "method",
+          "module_path": "pkg.module_a.Encoder.validate",
+          "role_for_pbt": "Validation logic that could define pre/post conditions for encode"
+        }
+      ]
+    },
+    {
+      "rel_path": "pkg/subpkg/module_b.py",
+      "module_path": "pkg.subpkg.module_b",
+      "reason": "May contain alternative encoder implementations or decoder logic that should behave consistently",
+      "notable_symbols": [
+        {
+          "name": "Decoder",
+          "kind": "class",
+          "module_path": "pkg.subpkg.module_b.Decoder",
+          "role_for_pbt": "Potential decoder class for testing encode/decode round-trip properties"
+        },
+        {
+          "name": "AlternativeEncoder",
+          "kind": "class",
+          "module_path": "pkg.subpkg.module_b.AlternativeEncoder",
+          "role_for_pbt": "Alternative implementation that should produce same results for property-based equivalence testing"
+        },
+        {
+          "name": "validate_encoding",
+          "kind": "function",
+          "module_path": "pkg.subpkg.module_b.validate_encoding",
+          "role_for_pbt": "Validation function that could define invariants for encoded output"
+        }
+      ]
+    },
+    {
+      "rel_path": "pkg/__init__.py",
+      "module_path": "pkg",
+      "reason": "Package initialization may expose encoder/decoder APIs or define module relationships",
+      "notable_symbols": [
+        {
+          "name": "Encoder",
+          "kind": "class",
+          "module_path": "pkg.Encoder",
+          "role_for_pbt": "Re-exported encoder class for testing public API behavior"
+        },
+        {
+          "name": "get_default_encoder",
+          "kind": "function",
+          "module_path": "pkg.get_default_encoder",
+          "role_for_pbt": "Factory function that could provide encoder instances for property testing"
+        }
+      ]
+    },
+    {
+      "rel_path": "pkg/subpkg/__init__.py",
+      "module_path": "pkg.subpkg",
+      "reason": "Subpackage initialization may expose decoder functionality or define encoding standards",
+      "notable_symbols": [
+        {
+          "name": "Decoder",
+          "kind": "class",
+          "module_path": "pkg.subpkg.Decoder",
+          "role_for_pbt": "Re-exported decoder class for testing encode/decode consistency"
+        },
+        {
+          "name": "encoding_standard",
+          "kind": "variable",
+          "module_path": "pkg.subpkg.encoding_standard",
+          "role_for_pbt": "Constants defining encoding standards that could be used as invariants in property tests"
+        }
+      ]
+    }
+  ]
+}
+```
+2025-11-26T23:25:24Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert in property-based testing for Python.
+You are given:
+- A target function (with module path metadata).
+- The full source code of several **related files** picked by another agent.
+
+Your job is to extract structured information that will help generate
+high-quality **cross-function PBTs**.
+
+## STRICT REQUIREMENT ABOUT METADATA
+- Every time you refer to a function/class/method, you MUST include its
+  full Python **module path** in the output.
+- This metadata must be sufficient for importing in tests.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Related files (with source)
+
+
+## Your goals
+For the target function, infer:
+- **Invariants**: properties that should always hold about inputs/outputs/state.
+- **Preconditions**: assumptions that must hold for the function to behave correctly.
+- **Postconditions**: guarantees about outputs or state after the function returns.
+- **Cross-function relationships**: how this function interacts with other functions,
+  such as encode/decode pairs, round-trips, consistency with validators, etc.
+- **Examples**: a few concrete input/output or usage examples that illustrate the above.
+
+## Output format (MUST be valid JSON)
+Return a JSON object:
+
+{
+  "target_function_module_path": "<string>",
+  "description": "<high-level description of the function's behavior and role>",
+  "invariants": ["<string>", "..."],
+  "preconditions": ["<string>", "..."],
+  "postconditions": ["<string>", "..."],
+  "relationships": [
+    {
+      "description": "<relation, e.g. encode/decode round-trip>",
+      "related_symbol_module_path": "<python.module.path>",
+      "kind": "function|class|method"
+    }
+  ],
+  "examples": ["<example 1>", "<example 2>", "..."]
+}
+
+Do not include any comments outside JSON. Do not use trailing commas.
+2025-11-26T23:25:35Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "description": "Converts a string to uppercase encoding",
+  "invariants": ["Output string length equals input string length", "Output contains only uppercase characters", "Output preserves non-alphabetic characters unchanged"],
+  "preconditions": ["Input must be a string", "Input should not be None"],
+  "postconditions": ["Output is always a string", "Output is uppercase version of input", "Function is pure (no side effects)"],
+  "relationships": [
+    {
+      "description": "Potential decode counterpart that converts uppercase back to original case",
+      "related_symbol_module_path": "pkg.module_a.Encoder.decode",
+      "kind": "method"
+    },
+    {
+      "description": "Round-trip property: decode(encode(value)) should preserve value for case-insensitive operations",
+      "related_symbol_module_path": "pkg.module_a.Encoder.decode",
+      "kind": "method"
+    },
+    {
+      "description": "Consistency with string validation functions",
+      "related_symbol_module_path": "pkg.module_a.Validator",
+      "kind": "class"
+    }
+  ],
+  "examples": ["encode('hello') → 'HELLO'", "encode('Hello123') → 'HELLO123'", "encode('') → ''"]
+}
+2025-11-26T23:25:35Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are assisting with semantic vector search for Python source code
+in order to build cross-function property-based tests (PBT).
+
+## STRICT REQUIREMENT ABOUT METADATA
+- You must restate the target function's module path exactly, as this will be
+  stored as metadata for downstream steps.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Your goal
+Produce a **single natural-language query** that is well-suited for vector
+similarity search to find:
+- potential inverse/dual functions (e.g. encode/decode, serialize/deserialize)
+- callers and callees that impose stronger invariants
+- validators or checkers enforcing constraints related to this function
+- alternative implementations with same behavior
+
+The query should:
+- Be descriptive and self-contained (no references like "the function above").
+- Emphasize properties, invariants, and relationships over concrete variable names.
+
+## Output format (MUST be valid JSON)
+Return:
+
+{
+  "target_function_module_path": "<string>",
+  "retrieval_query": "<single natural language query>"
+}
+
+Do not include comments, only JSON.
+2025-11-26T23:25:40Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "retrieval_query": "Functions that transform string case, particularly converting to uppercase, and their inverse operations like lowercase conversion or case preservation. Includes validators that check string case constraints, callers that process uppercase strings, alternative implementations with equivalent uppercase behavior, and dual functions in encode/decode or serialize/deserialize pairs where case transformation is involved."
+}
+2025-11-26T23:25:40Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert in property-based testing for Python.
+        You are given:
+        - A target function.
+        - A semantic search query.
+        - A set of code/documentation snippets retrieved by vector search.
+
+        ## STRICT REQUIREMENT ABOUT METADATA
+        - Each time you reference a symbol from the retrieved snippets, you must include
+          its `module_path` metadata exactly as provided (or inferred if clearly implied).
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Retrieval query
+        Functions that transform string case, particularly converting to uppercase, and their inverse operations like lowercase conversion or case preservation. Includes validators that check string case constraints, callers that process uppercase strings, alternative implementations with equivalent uppercase behavior, and dual functions in encode/decode or serialize/deserialize pairs where case transformation is involved.
+
+        ## Retrieval hits
+        ### Hit 0
+- module_path: pkg.module_a.Encoder.encode
+- rel_path: pkg/module_a.py
+- metadata: {'module_path': 'pkg.module_a.Encoder.encode', 'rel_path': 'pkg/module_a.py'}
+```python
+    def encode(self, value: str) -> str:
+        return value.upper()
+```
+
+### Hit 1
+- module_path: pkg.subpkg.module_b.mul
+- rel_path: pkg/subpkg/module_b.py
+- metadata: {'module_path': 'pkg.subpkg.module_b.mul', 'rel_path': 'pkg/subpkg/module_b.py'}
+```python
+def mul(x: int, y: int) -> int:
+    """Another simple function for discovery tests."""
+    return x * y
+```
+
+### Hit 2
+- module_path: pkg.module_a.add
+- rel_path: pkg/module_a.py
+- metadata: {'module_path': 'pkg.module_a.add', 'rel_path': 'pkg/module_a.py'}
+```python
+def add(x: int, y: int) -> int:
+    """Simple function to test function discovery."""
+    return x + y
+```
+
+        ## Your goals
+        Similar to previous step, but based on retrieval hits:
+        - Infer invariants, preconditions, postconditions, cross-function relationships,
+          and concrete examples that are useful for generating PBTs.
+        - Especially focus on how the target function should behave **in relation to** the
+          retrieved symbols (round-trips, consistency, error handling, etc.).
+
+        ## Output format (MUST be valid JSON)
+
+        {
+          "target_function_module_path": "<string>",
+          "description": "<summary of new insights from retrieval>",
+          "invariants": ["<string>", "..."],
+          "preconditions": ["<string>", "..."],
+          "postconditions": ["<string>", "..."],
+          "relationships": [
+            {
+              "description": "<relation>",
+              "related_symbol_module_path": "<python.module.path>",
+              "kind": "function|class|method"
+            }
+          ],
+          "examples": ["<example 1>", "<example 2>", "..."]
+        }
+
+        Do not include comments, only JSON.
+2025-11-26T23:25:50Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "description": "Retrieval confirms the target function is the primary uppercase transformation function in the codebase. No inverse operations or related case transformation functions were found, suggesting this is a standalone utility. The retrieved hits show other simple functions (add, mul) but no string processing counterparts.",
+  "invariants": ["Output string length equals input string length", "All output characters are uppercase", "Output is always a string when input is a string"],
+  "preconditions": ["Input must be a string", "Input should not be None"],
+  "postconditions": ["For any input string s, encode(s) == s.upper()", "encode('') == ''", "encode preserves non-alphabetic characters unchanged"],
+  "relationships": [
+    {
+      "description": "Located in same module as add function but no functional relationship",
+      "related_symbol_module_path": "pkg.module_a.add",
+      "kind": "function"
+    }
+  ],
+  "examples": ["encode('hello') == 'HELLO'", "encode('123') == '123'", "encode('MixED') == 'MIXED'"]
+}
+2025-11-26T23:25:50Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'Converts a string to uppercase encoding', 'invariants': ['Output string length equals input string length', 'Output contains only uppercase characters', 'Output preserves non-alphabetic characters unchanged'], 'preconditions': ['Input must be a string', 'Input should not be None'], 'postconditions': ['Output is always a string', 'Output is uppercase version of input', 'Function is pure (no side effects)'], 'relationships': ['Potential decode counterpart that converts uppercase back to original case', 'Round-trip property: decode(encode(value)) should preserve value for case-insensitive operations', 'Consistency with string validation functions'], 'examples': ["encode('hello') → 'HELLO'", "encode('Hello123') → 'HELLO123'", "encode('') → ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': 'Retrieval confirms the target function is the primary uppercase transformation function in the codebase. No inverse operations or related case transformation functions were found, suggesting this is a standalone utility. The retrieved hits show other simple functions (add, mul) but no string processing counterparts.', 'invariants': ['Output string length equals input string length', 'All output characters are uppercase', 'Output is always a string when input is a string'], 'preconditions': ['Input must be a string', 'Input should not be None'], 'postconditions': ['For any input string s, encode(s) == s.upper()', "encode('') == ''", 'encode preserves non-alphabetic characters unchanged'], 'relationships': ['Located in same module as add function but no functional relationship'], 'examples': ["encode('hello') == 'HELLO'", "encode('123') == '123'", "encode('MixED') == 'MIXED'"]}
+```
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Keep tests focused but expressive; 2–6 properties per target function is fine.
+
+## Output format
+Return **only** the Python test module code, no backticks, no explanations.
+2025-11-26T23:26:03Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import pytest
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+class TestEncoder:
+    def setup_method(self):
+        self.encoder = Encoder()
+
+    @given(st.text())
+    def test_output_length_equals_input_length(self, value):
+        result = self.encoder.encode(value)
+        assert len(result) == len(value)
+
+    @given(st.text())
+    def test_output_contains_only_uppercase(self, value):
+        result = self.encoder.encode(value)
+        assert result == result.upper()
+
+    @given(st.text())
+    def test_preserves_non_alphabetic_characters(self, value):
+        result = self.encoder.encode(value)
+        for i, char in enumerate(value):
+            if not char.isalpha():
+                assert result[i] == char
+
+    @given(st.text())
+    def test_output_is_uppercase_version(self, value):
+        result = self.encoder.encode(value)
+        assert result == value.upper()
+
+    @given(st.text())
+    def test_output_is_always_string(self, value):
+        result = self.encoder.encode(value)
+        assert isinstance(result, str)
+
+    def test_empty_string(self):
+        result = self.encoder.encode('')
+        assert result == ''
+
+    @given(st.text(min_size=1))
+    def test_pure_function(self, value):
+        encoder = Encoder()
+        result1 = encoder.encode(value)
+        result2 = encoder.encode(value)
+        assert result1 == result2
+
+    @given(st.none())
+    def test_none_input_raises_error(self, value):
+        with pytest.raises(Exception):
+            self.encoder.encode(value)

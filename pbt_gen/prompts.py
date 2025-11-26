@@ -290,7 +290,6 @@ def prompt_generate_pbt(
     target_function: FunctionInfo,
     signals_from_files: dict,
     signals_from_retrieval: dict | None,
-    test_module_path: str,
 ) -> str:
     """
     Step 5: generate PBT code based on all collected signals.
@@ -315,18 +314,15 @@ def prompt_generate_pbt(
         {target_function.source}
         ```
 
-        ## Signals from related files (step 3, already JSON-parsed)
+        ## Signals from related files 
         ```json
         {signals_from_files}
         ```
 
-        ## Signals from retrieval hits (step 4, already JSON-parsed; may be null)
+        ## Signals from retrieval hits 
         ```json
         {signals_from_retrieval}
         ```
-
-        ## Test module path for the generated code
-        - test_module_path: `{test_module_path}`
 
         ## Your goals
         - Use Hypothesis (and optionally pytest) to encode the discovered invariants,

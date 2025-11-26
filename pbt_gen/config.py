@@ -6,9 +6,10 @@ from pathlib import Path
 
 @dataclass
 class LLMConfig:
-    model: str = "gpt-4.1"
+    model: str = "deepseek-chat"
     temperature: float = 0.1
-    max_tokens: int = 3000
+    max_tokens: int = 6000
+    api_base: str = 'https://api.deepseek.com'
 
 
 @dataclass

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import asyncio
 import json
 import subprocess
+import re
 from pathlib import Path
 
 from .config import AppConfig
@@ -181,9 +181,9 @@ class PBTOrchestrator:
         target_fn: FunctionInfo,
         signals_files: ExtractedPBTSignal,
         signals_retrieval: ExtractedPBTSignal | None,
-        test_module_base: str = "tests.test_pbt_auto",
+        index: int,
     ) -> GeneratedPBT:
-        test_module_path = f"{test_module_base}_{target_fn.module_path.replace('.', '_')}"
+        # 使用传入的 index 构造唯一的 test 模块路径与文件名，避免重复
         signals_from_files = {
             "description": signals_files.description,
             "invariants": signals_files.invariants,
@@ -207,19 +207,19 @@ class PBTOrchestrator:
             target_function=target_fn,
             signals_from_files=signals_from_files,
             signals_from_retrieval=signals_from_retrieval,
-            test_module_path=test_module_path,
         )
-        test_code = await self.llm.complete(prompt)
+        raw_response = await self.llm.complete(prompt)
+        test_code = extract_python_code_from_response(raw_response)
 
         output_dir = self.config.project.output_dir
         output_dir.mkdir(parents=True, exist_ok=True)
-        test_file_path = output_dir / f"{test_module_path.split('.')[-1]}.py"
+        test_file_path = output_dir / f"test_pbt_{index}.py"
         test_file_path.write_text(test_code, encoding="utf-8")
 
         pylint_output = self._run_pylint_on_file(test_file_path)
         return GeneratedPBT(
             target_function=target_fn,
-            test_module_path=test_module_path,
+            test_module_path=test_file_path,
             test_code=test_code,
             pylint_output=pylint_output,
         )
@@ -227,13 +227,45 @@ class PBTOrchestrator:
     def _run_pylint_on_file(self, path: Path) -> str:
         try:
             result = subprocess.run(
-                ["pylint", str(path)],
+                [
+                    "pylint",
+                    # 仅报告错误，关闭所有 warning / convention / refactor 等信息
+                    "--disable=all",
+                    "--enable=E",
+                    str(path),
+                ],
                 capture_output=True,
                 text=True,
                 check=False,
+                # 确保在被测项目根目录下运行，以避免 import 错误
+                cwd=str(self.config.project.project_dir),
             )
             return result.stdout + "\n" + result.stderr
         except FileNotFoundError:
             return "pylint not found in PATH. Please install pylint to enable static checks."
+
+
+def extract_python_code_from_response(response: str) -> str:
+    if not response:
+        return ""
+
+    python_block_pattern = re.compile(
+        r"```python\s*(?P<code>.+?)```",
+        re.DOTALL | re.IGNORECASE,
+    )
+    match = python_block_pattern.search(response)
+    if match:
+        return match.group("code").strip()
+
+    generic_block_pattern = re.compile(
+        r"```\s*(?P<code>.+?)```",
+        re.DOTALL,
+    )
+    match = generic_block_pattern.search(response)
+    if match:
+        return match.group("code").strip()
+
+    return response.strip()
+
 
 
