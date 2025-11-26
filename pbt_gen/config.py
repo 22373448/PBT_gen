@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -29,7 +29,7 @@ class ProjectConfig:
 @dataclass
 class AppConfig:
     project: ProjectConfig
-    llm: LLMConfig = LLMConfig()
-    pbt: PBTConfig = PBTConfig()
+    llm: LLMConfig = field(default_factory=LLMConfig)
+    pbt: PBTConfig = field(default_factory=PBTConfig)
 
 
