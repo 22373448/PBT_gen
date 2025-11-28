@@ -36,6 +36,10 @@ def parse_args() -> argparse.Namespace:
         default=10,
         help="Top N related files / retrieval hits to consider.",
     )
+    parser.add_argument(
+        "--python-path",
+        help="Path to Python executable to use for running tests. If not specified, uses system python.",
+    )
     return parser.parse_args()
 
 
@@ -53,6 +57,7 @@ async def main_async() -> None:
             project_dir=project_dir,
             output_dir=output_dir,
             functions=target_functions,
+            python_path=args.python_path,
         ),
         llm=LLMConfig(),
         pbt=PBTConfig(top_n_related_files=args.top_n),

@@ -5,5 +5,6 @@ export TRANSFORMER_PATH='/mnt/c/Users/34203/Desktop/test-generation/my_transform
 python -m pbt_gen.cli --project-dir /mnt/c/Users/34203/Desktop/PBT_gen/example_project \
         --output-dir /mnt/c/Users/34203/Desktop/PBT_gen/example_project/tests \
         --functions pkg.module_a.Encoder.encode \
-        --top-n 10
+        --top-n 10 \
+        --python-path /home/ler/miniconda3/envs/test4dt/bin/python
         

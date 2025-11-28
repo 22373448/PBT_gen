@@ -1,50 +1,69 @@
-import pytest
+from hypothesis import given
+from hypothesis import given, assume
 from hypothesis import given, strategies as st
+from hypothesis.strategies import text
 from pkg.module_a import Encoder
+import hypothesis.strategies as st
+import pytest
 
-class TestEncoder:
-    def setup_method(self):
-        self.encoder = Encoder()
+@given(st.text().filter(lambda x: len(x.encode('utf-8')) == len(x) or not any(ord(c) > 127 for c in x)))
+def test_encode_output_string_length_equals_input_string_length(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
 
-    @given(st.text())
-    def test_output_length_equals_input_length(self, value):
-        result = self.encoder.encode(value)
-        assert len(result) == len(value)
+@given(st.text())
+def test_encode_output_is_always_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
 
-    @given(st.text())
-    def test_output_contains_only_uppercase(self, value):
-        result = self.encoder.encode(value)
-        assert result == result.upper()
+@given(st.text())
+def test_encode_output_is_string_when_input_is_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
 
-    @given(st.text())
-    def test_preserves_non_alphabetic_characters(self, value):
-        result = self.encoder.encode(value)
-        for i, char in enumerate(value):
-            if not char.isalpha():
-                assert result[i] == char
+@given(text())
+def test_encode_empty_string_returns_empty_string(value):
+    encoder = Encoder()
+    if value == "":
+        result = encoder.encode(value)
+        assert result == ""
 
-    @given(st.text())
-    def test_output_is_uppercase_version(self, value):
-        result = self.encoder.encode(value)
-        assert result == value.upper()
+@given(st.text())
+def test_encode_is_idempotent(value):
+    encoder = Encoder()
+    once = encoder.encode(value)
+    twice = encoder.encode(once)
+    assert twice == once
 
-    @given(st.text())
-    def test_output_is_always_string(self, value):
-        result = self.encoder.encode(value)
-        assert isinstance(result, str)
+@given(st.text())
+def test_encode_equals_string_upper(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result == value.upper()
 
-    def test_empty_string(self):
-        result = self.encoder.encode('')
-        assert result == ''
+@given(st.text())
+def test_encode_output_is_uppercase_version_of_input(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result == value.upper()
 
-    @given(st.text(min_size=1))
-    def test_pure_function(self, value):
-        encoder = Encoder()
-        result1 = encoder.encode(value)
-        result2 = encoder.encode(value)
-        assert result1 == result2
+@given(st.text())
+def test_encode_round_trip_consistency_with_hypothetical_decode(value):
+    encoder = Encoder()
+    encoded = encoder.encode(value)
+    assert encoder.encode(encoded) == encoded
 
-    @given(st.none())
-    def test_none_input_raises_error(self, value):
-        with pytest.raises(Exception):
-            self.encoder.encode(value)
+@given(st.none())
+def test_encode_rejects_none_input(value):
+    encoder = Encoder()
+    with pytest.raises((TypeError, AttributeError)):
+        encoder.encode(value)
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)

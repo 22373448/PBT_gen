@@ -290,10 +290,28 @@ def prompt_generate_pbt(
     target_function: FunctionInfo,
     signals_from_files: dict,
     signals_from_retrieval: dict | None,
+    property_description: str | None = None,
+    property_type: str | None = None,
 ) -> str:
     """
     Step 5: generate PBT code based on all collected signals.
+    If property_description and property_type are provided, generate only ONE test for that specific property.
+    Otherwise, generate multiple tests (legacy behavior).
     """
+    property_focus = ""
+    if property_description and property_type:
+        property_focus = f"""
+        ## CRITICAL: Generate ONLY ONE test function
+        You must generate **exactly ONE property-based test function** for the following specific property:
+        - Property type: {property_type}
+        - Property description: {property_description}
+        
+        IMPORTANT:
+        - Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+        - Do NOT generate class definitions or setup methods. Only generate the test function itself.
+        - The test function will be merged with other tests later, so focus only on the single test function.
+        """
+    
     return dedent(
         f"""
         You are a senior Python engineer and a property-based testing expert.
@@ -323,16 +341,153 @@ def prompt_generate_pbt(
         ```json
         {signals_from_retrieval}
         ```
-
+        {property_focus}
         ## Your goals
         - Use Hypothesis (and optionally pytest) to encode the discovered invariants,
           preconditions, postconditions, and cross-function relationships.
         - Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
         - Include negative tests where appropriate (violating preconditions).
-        - Keep tests focused but expressive; 2–6 properties per target function is fine.
+        {"- Generate exactly ONE test function for the specified property above." if property_description and property_type else "- Keep tests focused but expressive; 2–6 properties per target function is fine."}
 
         ## Output format
-        Return **only** the Python test module code, no backticks, no explanations.
+        Return **only** the Python test code (a single test function), no backticks, no explanations.
+        {"The output should be a single test function definition, not a complete test module." if property_description and property_type else "Return **only** the Python test module code, no backticks, no explanations."}
+        """
+    ).strip()
+
+
+def prompt_judge_function_bug(
+    target_function: FunctionInfo,
+    test_code: str,
+    error_message: str,
+    property_description: str,
+    property_type: str,
+) -> str:
+    """
+    Prompt for judging whether a test failure indicates a real bug in the function
+    or an error in the test generation. Must be very conservative.
+    """
+    return dedent(
+        f"""
+        You are an expert Python engineer and testing specialist.
+        A property-based test was generated for a function, but it failed when executed.
+        Your task is to determine whether the failure indicates a **real bug in the function**
+        or an **error in the test generation**.
+
+        ## CRITICAL: Be VERY CONSERVATIVE
+        - Only conclude it's a function bug if you have **strong, evidence-based reasons**
+        - The property must be **clearly valid** and **well-defined**
+        - The test code must be **correctly written** and **properly testing the property**
+        - The error must **directly violate** the stated property or function contract
+        - If there's any doubt, conclude it's a test generation error
+
+        ## Target function
+        - module_path: `{target_function.module_path}`
+        - file: `{target_function.file.rel_path}`
+        - source:
+        ```python
+        {target_function.source}
+        ```
+
+        ## Property being tested
+        - Property type: {property_type}
+        - Property description: {property_description}
+
+        ## Generated test code
+        ```python
+        {test_code}
+        ```
+
+        ## Error message from test execution
+        ```
+        {error_message}
+        ```
+
+        ## Your analysis
+        Analyze the error carefully:
+        1. Is the property clearly valid and well-defined for this function?
+        2. Is the test code correctly implementing the property test?
+        3. Does the error message indicate the function violated the property?
+        4. Could the error be due to:
+           - Incorrect test setup (missing imports, wrong module paths)?
+           - Incorrect property interpretation?
+           - Missing preconditions or assumptions?
+           - Test code bugs (wrong assertions, wrong function calls)?
+
+        ## Output format (MUST be valid JSON)
+        Return a JSON object:
+        {{
+          "is_function_bug": <true|false>,
+          "confidence": "<high|medium|low>",
+          "reasoning": "<detailed explanation of your judgment>",
+          "evidence": [
+            "<evidence point 1>",
+            "<evidence point 2>",
+            "..."
+          ],
+          "property_validity": "<explanation of whether the property is valid>",
+          "test_correctness": "<explanation of whether the test is correctly written>"
+        }}
+
+        Remember: Only mark is_function_bug as true if you have STRONG evidence that:
+        - The property is clearly valid
+        - The test correctly implements the property
+        - The function clearly violates the property
+
+        Do not include comments, only JSON.
+        """
+    ).strip()
+
+
+def prompt_fix_test(
+    target_function: FunctionInfo,
+    original_test_code: str,
+    error_message: str,
+    property_description: str,
+    property_type: str,
+) -> str:
+    """
+    Prompt for fixing a test that failed due to test generation errors.
+    """
+    return dedent(
+        f"""
+        You are an expert Python engineer and testing specialist.
+        A property-based test was generated but failed when executed.
+        The failure has been determined to be due to a **test generation error**, not a function bug.
+        Your task is to fix the test code.
+
+        ## Target function
+        - module_path: `{target_function.module_path}`
+        - file: `{target_function.file.rel_path}`
+        - source:
+        ```python
+        {target_function.source}
+        ```
+
+        ## Property being tested
+        - Property type: {property_type}
+        - Property description: {property_description}
+
+        ## Original test code (with error)
+        ```python
+        {original_test_code}
+        ```
+
+        ## Error message from test execution
+        ```
+        {error_message}
+        ```
+
+        ## Your task
+        Fix the test code to:
+        1. Correctly import all necessary modules using the exact module paths
+        2. Properly set up the test (e.g., class instantiation if needed)
+        3. Correctly implement the property test
+        4. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
         """
     ).strip()
 

@@ -25,6 +25,7 @@ class ProjectConfig:
     project_dir: Path
     output_dir: Path
     functions: list[str] | None = None  # module paths, if None -> all
+    python_path: str | None = None  # path to python executable, if None -> use system python
 
 
 @dataclass
