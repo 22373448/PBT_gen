@@ -4,6 +4,7 @@ import json
 import subprocess
 import re
 from pathlib import Path
+from typing import List
 
 from .config import AppConfig
 from .file_tree import build_mac_style_tree, collect_python_files, fill_module_paths
@@ -21,6 +22,7 @@ from .prompts import (
     prompt_build_retrieval_query,
     prompt_extract_pbt_signals_from_files,
     prompt_extract_pbt_signals_from_retrieval,
+    prompt_fix_pylint_errors,
     prompt_fix_test,
     prompt_generate_pbt,
     prompt_judge_function_bug,
@@ -184,7 +186,7 @@ class PBTOrchestrator:
         signals_files: ExtractedPBTSignal,
         signals_retrieval: ExtractedPBTSignal | None,
         index: int,
-    ) -> GeneratedPBT:
+    ) -> List[GeneratedPBT]:
         # 使用传入的 index 构造唯一的 test 模块路径与文件名，避免重复
         signals_from_files = {
             "description": signals_files.description,
@@ -232,11 +234,10 @@ class PBTOrchestrator:
             if description.strip():
                 properties.append(("description", description))
 
-        # 为每个property生成一个测试，运行并验证
-        generated_tests = []
         output_dir = self.config.project.output_dir
         output_dir.mkdir(parents=True, exist_ok=True)
         
+        generated_tests = []
         for prop_idx, (prop_type, prop_desc) in enumerate(properties):
             # 生成测试
             prompt = prompt_generate_pbt(
@@ -253,153 +254,48 @@ class PBTOrchestrator:
                 continue
             
             # 创建临时测试文件来运行单个测试
-            temp_test_file = output_dir / f"_temp_test_{index}_{prop_idx}.py"
+            temp_test_file = output_dir / f"test_{index}_{prop_idx}.py"
             
-            # 构建临时测试文件（包含imports和单个测试）
-            temp_imports = set()
-            test_func_lines = []
-            for line in test_code.split('\n'):
-                stripped = line.strip()
-                if stripped.startswith('import ') or stripped.startswith('from '):
-                    temp_imports.add(line)
-                else:
-                    test_func_lines.append(line)
-            
-            temp_import_section = '\n'.join(sorted(temp_imports)) if temp_imports else ''
-            temp_test_section = '\n'.join(test_func_lines).strip()
-            
-            if temp_import_section and temp_test_section:
-                temp_test_content = f"{temp_import_section}\n\n{temp_test_section}\n"
-            elif temp_test_section:
-                temp_test_content = f"{temp_test_section}\n"
-            else:
-                continue
-            
-            temp_test_file.write_text(temp_test_content, encoding="utf-8")
-            
-            # 运行测试
-            test_passed, error_message = self._run_test_file(temp_test_file)
-            
-            if test_passed:
-                # 测试通过，保留
-                generated_tests.append(test_code)
-            else:
-                # 测试失败，判断是否是function bug
-                is_function_bug, judgment = await self._judge_if_function_bug(
-                    target_fn=target_fn,
-                    test_code=temp_test_content,
-                    error_message=error_message,
-                    property_description=prop_desc,
-                    property_type=prop_type,
-                )
+            # 修复pylint语法错误的循环（最多重试3次）
+            max_fix_attempts = 3
+            for fix_attempt in range(max_fix_attempts):
+                temp_test_file.write_text(test_code, encoding="utf-8")
+                pylint_output = self._run_pylint_on_file(temp_test_file)
                 
-                if is_function_bug:
-                    # 确认是function bug，保留测试
-                    print(f"  Property '{prop_desc[:50]}...' failed - confirmed function bug")
-                    generated_tests.append(test_code)
-                else:
-                    # 不是function bug，尝试修正一次
-                    print(f"  Property '{prop_desc[:50]}...' failed - attempting to fix test")
-                    fixed_test_code = await self._fix_test_code(
-                        target_fn=target_fn,
-                        original_test_code=temp_test_content,
-                        error_message=error_message,
+                # 如果没有pylint错误，跳出修复循环
+                if not self._has_pylint_errors(pylint_output):
+                    break
+                
+                # 如果有pylint错误且还有重试机会，让LLM修复
+                if fix_attempt < max_fix_attempts - 1:
+                    fix_prompt = prompt_fix_pylint_errors(
+                        target_function=target_fn,
+                        original_test_code=test_code,
+                        pylint_output=pylint_output,
                         property_description=prop_desc,
                         property_type=prop_type,
                     )
+                    fixed_response = await self.llm.complete(fix_prompt)
+                    fixed_code = extract_python_code_from_response(fixed_response)
                     
-                    if fixed_test_code.strip():
-                        # 更新临时测试文件
-                        temp_imports_fixed = set()
-                        test_func_lines_fixed = []
-                        for line in fixed_test_code.split('\n'):
-                            stripped = line.strip()
-                            if stripped.startswith('import ') or stripped.startswith('from '):
-                                temp_imports_fixed.add(line)
-                            else:
-                                test_func_lines_fixed.append(line)
-                        
-                        temp_import_section_fixed = '\n'.join(sorted(temp_imports_fixed)) if temp_imports_fixed else ''
-                        temp_test_section_fixed = '\n'.join(test_func_lines_fixed).strip()
-                        
-                        if temp_import_section_fixed and temp_test_section_fixed:
-                            temp_test_content_fixed = f"{temp_import_section_fixed}\n\n{temp_test_section_fixed}\n"
-                        elif temp_test_section_fixed:
-                            temp_test_content_fixed = f"{temp_test_section_fixed}\n"
-                        else:
-                            print(f"  Property '{prop_desc[:50]}...' - fixed test is empty, skipping")
-                            temp_test_file.unlink(missing_ok=True)
-                            continue
-                        
-                        temp_test_file.write_text(temp_test_content_fixed, encoding="utf-8")
-                        
-                        # 再次运行修正后的测试
-                        test_passed_fixed, error_message_fixed = self._run_test_file(temp_test_file)
-                        
-                        if test_passed_fixed:
-                            # 修正成功，保留
-                            generated_tests.append(fixed_test_code)
-                            print(f"  Property '{prop_desc[:50]}...' - test fixed successfully")
-                        else:
-                            # 修正后仍然失败，放弃
-                            print(f"  Property '{prop_desc[:50]}...' - test fix failed, skipping")
+                    if fixed_code.strip():
+                        test_code = fixed_code
                     else:
-                        print(f"  Property '{prop_desc[:50]}...' - no fix generated, skipping")
-            
-            # 清理临时文件
-            temp_test_file.unlink(missing_ok=True)
+                        # 如果LLM没有返回修复后的代码，停止重试
+                        break
+                # 最后一次尝试，即使有错误也继续
 
-        # 合并所有生成的测试到一个文件中
-        # 提取imports并合并，然后合并所有测试代码
-        all_imports = set()
-        all_test_code_blocks = []
-        
-        for test_code in generated_tests:
-            if not test_code.strip():
-                continue
-                
-            lines = test_code.split('\n')
-            non_import_lines = []
-            
-            for line in lines:
-                stripped = line.strip()
-                # 收集import语句
-                if stripped.startswith('import ') or stripped.startswith('from '):
-                    all_imports.add(line)
-                else:
-                    non_import_lines.append(line)
-            
-            # 保留非import部分的代码
-            non_import_code = '\n'.join(non_import_lines).strip()
-            if non_import_code:
-                all_test_code_blocks.append(non_import_code)
+            test_passed, error_message = self._run_test_file(temp_test_file)
+            generated_tests.append(GeneratedPBT(
+                target_function=target_fn,
+                test_module_path=temp_test_file,
+                test_code=test_code,
+                pylint_output=pylint_output,
+                passed=test_passed,
+            ))
 
-        # 构建完整的测试文件
-        import_section = '\n'.join(sorted(all_imports)) if all_imports else ''
-        test_section = '\n\n'.join(all_test_code_blocks) if all_test_code_blocks else ''
-        
-        if import_section and test_section:
-            final_test_code = f"{import_section}\n\n{test_section}\n"
-        elif test_section:
-            final_test_code = f"{test_section}\n"
-        elif import_section:
-            final_test_code = f"{import_section}\n\n# No test functions generated\n"
-        else:
-            final_test_code = "# No tests generated\n"
+        return generated_tests
 
-        init_file_path = output_dir / f"__init__.py"
-        init_file_path.write_text("", encoding="utf-8")
-
-        test_file_path = output_dir / f"test_pbt_{index}.py"
-        test_file_path.write_text(final_test_code, encoding="utf-8")
-
-        pylint_output = self._run_pylint_on_file(test_file_path)
-        return GeneratedPBT(
-            target_function=target_fn,
-            test_module_path=test_file_path,
-            test_code=final_test_code,
-            pylint_output=pylint_output,
-        )
 
     def _run_pylint_on_file(self, path: Path) -> str:
         try:
@@ -420,6 +316,17 @@ class PBTOrchestrator:
             return result.stdout + "\n" + result.stderr
         except FileNotFoundError:
             return "pylint not found in PATH. Please install pylint to enable static checks."
+
+    def _has_pylint_errors(self, pylint_output: str) -> bool:
+        """
+        Check if pylint output contains any errors.
+        Pylint errors typically start with 'E' followed by numbers (e.g., E0001, E0602).
+        """
+        if not pylint_output or "pylint not found" in pylint_output:
+            return False
+        # Check for error patterns: E followed by digits, or syntax error messages
+        error_pattern = re.compile(r'E\d{4}|syntax\s+error|SyntaxError', re.IGNORECASE)
+        return bool(error_pattern.search(pylint_output))
 
     def _run_test_file(self, test_file_path: Path) -> tuple[bool, str]:
         """

@@ -492,3 +492,56 @@ def prompt_fix_test(
     ).strip()
 
 
+def prompt_fix_pylint_errors(
+    target_function: FunctionInfo,
+    original_test_code: str,
+    pylint_output: str,
+    property_description: str,
+    property_type: str,
+) -> str:
+    """
+    Prompt for fixing test code that has pylint syntax errors.
+    """
+    return dedent(
+        f"""
+        You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `{target_function.module_path}`
+        - file: `{target_function.file.rel_path}`
+        - source:
+        ```python
+        {target_function.source}
+        ```
+
+        ## Property being tested
+        - Property type: {property_type}
+        - Property description: {property_description}
+
+        ## Original test code (with syntax errors)
+        ```python
+        {original_test_code}
+        ```
+
+        ## Pylint error output
+        ```
+        {pylint_output}
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+        """
+    ).strip()
+
+

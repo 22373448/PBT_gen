@@ -5767,3 +5767,3326 @@ def test_encode_input_must_be_string(value):
     encoder = Encoder()
     result = encoder.encode(value)
     assert isinstance(result, str)
+2025-12-07T23:06:58Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        Your task is to identify source files that are semantically related to
+        the following target function, with a focus on properties, invariants,
+        and cross-function relationships that are useful for **property-based testing (PBT)**.
+
+        ## STRICT REQUIREMENT ABOUT METADATA
+        - For every file / function / class / method you mention, ALWAYS include its
+          **Python module path** metadata (e.g. `package.module`, `package.module.Class.method`).
+        - This metadata must be sufficient to import the symbol from test code.
+
+        ## Project file tree (macOS style)
+        example_project
+├── .hypothesis
+│   ├── constants
+│   │   ├── 944914a101e994d5
+│   │   └── e9369500129701e0
+│   ├── examples
+│   │   ├── 0339e2e0463affee
+│   │   │   ├── 016b84bab2f3764a
+│   │   │   ├── 0587f8df845a51b9
+│   │   │   ├── 1edc5ac596e0535d
+│   │   │   ├── 25d9c3d244b6c90b
+│   │   │   ├── 3d41479a8f8c04b6
+│   │   │   ├── 43f78f704b53d497
+│   │   │   ├── 4db79b81e9fe8fd1
+│   │   │   ├── 4e832aa4801f7861
+│   │   │   ├── 551581a55154bb18
+│   │   │   ├── 576f4714cf64c02a
+│   │   │   ├── 5feb25d4ca30935e
+│   │   │   ├── 6f8b7f00e4bede58
+│   │   │   ├── 71f067d75658b269
+│   │   │   ├── 85268d4ee1157c1b
+│   │   │   ├── 8c1ce709258b09d4
+│   │   │   ├── 9d04933cf0d337b3
+│   │   │   ├── a1408806cc54ebc9
+│   │   │   ├── a43704bee26c2656
+│   │   │   ├── b099ccbd90b4261a
+│   │   │   ├── b2e520daaaed0adf
+│   │   │   ├── c9d3f56b49e5125d
+│   │   │   ├── ca11abe824ad97ef
+│   │   │   ├── cf59e3d91f438158
+│   │   │   ├── d6ccd1b445b1d30b
+│   │   │   ├── d8f62cf95bbe7e38
+│   │   │   ├── d9fd005998dccb9d
+│   │   │   ├── ec57cc6a3800c9a2
+│   │   │   ├── ef6cf7d6ca2f306b
+│   │   │   ├── f4a1604f2562e55b
+│   │   │   ├── f6cfc50642c85bd9
+│   │   │   └── f931a8cd57c14b57
+│   │   ├── 04e6b3400353b141
+│   │   │   ├── 0339e2e0463affee
+│   │   │   ├── 28da2ab3c4ee9e82
+│   │   │   ├── 2f8852f7748a9755
+│   │   │   ├── 39dff6a69b86aceb
+│   │   │   ├── 54cfc7f424ef802a
+│   │   │   ├── 54e4fe837b83f7c3
+│   │   │   ├── 75bdd4bf0a9f86b4
+│   │   │   ├── 8d7d2e2265799aed
+│   │   │   ├── abdd860676322665
+│   │   │   ├── b5879bbb5656d192
+│   │   │   ├── b81374e14337e5a9
+│   │   │   ├── bd3692344a4997a2
+│   │   │   ├── e2b863977d9db227
+│   │   │   ├── edb8d059c77b8053
+│   │   │   ├── ee5650b294ff5ff7
+│   │   │   ├── f800742e79f5e1f5
+│   │   │   └── f8979b1f3048aeb9
+│   │   ├── 28da2ab3c4ee9e82
+│   │   │   └── 45ca6066c985e4e0
+│   │   ├── 2f8852f7748a9755
+│   │   │   └── 522dacb2d4bd0183
+│   │   ├── 39dff6a69b86aceb
+│   │   │   └── 03ebb74834d75cae
+│   │   ├── 54cfc7f424ef802a
+│   │   │   └── 327ebe8e2777678d
+│   │   ├── 54e4fe837b83f7c3
+│   │   │   ├── 25b144d596aeb4f5
+│   │   │   ├── 4eabd96c5e29bfa9
+│   │   │   ├── 741e4fe301a7b544
+│   │   │   ├── 8ff46adac9cd8997
+│   │   │   ├── c2dc3c0613baeeee
+│   │   │   └── c43cd61c9057e7e5
+│   │   ├── 75bdd4bf0a9f86b4
+│   │   │   ├── 0083514ce47c62ae
+│   │   │   ├── 0271475e8e7964b9
+│   │   │   ├── 038b700a3d0c58c9
+│   │   │   ├── 042ca197f14a8401
+│   │   │   ├── 048a4da78b627e5f
+│   │   │   ├── 04b269cfdfd7f69d
+│   │   │   ├── 06aa336e28340218
+│   │   │   ├── 06d4f18de052ef86
+│   │   │   ├── 0a87f7ff17ad802e
+│   │   │   ├── 0a97d944ac3817ae
+│   │   │   ├── 0aa6806f3e2dace8
+│   │   │   ├── 0aaeaceb4b13dbfc
+│   │   │   ├── 0b6fc2f6a49039fd
+│   │   │   ├── 0c777d44cd80586c
+│   │   │   ├── 0dbb3bff424a68a4
+│   │   │   ├── 0de2104c7261acac
+│   │   │   ├── 0f3f8540bad1ebae
+│   │   │   ├── 1004eee34827c306
+│   │   │   ├── 113a9f0b3a4340a8
+│   │   │   ├── 123eaffddfc18df9
+│   │   │   ├── 132216424d95063a
+│   │   │   ├── 14e2494e90db6bd4
+│   │   │   ├── 16e467178bac4ef6
+│   │   │   ├── 18590d1f73d3349f
+│   │   │   ├── 1cbd0878f76decab
+│   │   │   ├── 1e288e8b04a50a3d
+│   │   │   ├── 1eff28b1ecfcd3d1
+│   │   │   ├── 1f3812ff8e99e1f2
+│   │   │   ├── 1ffda40aa18f9aae
+│   │   │   ├── 210b36b0b2c29dac
+│   │   │   ├── 22bdf334e2c3ebeb
+│   │   │   ├── 22e9b3b41d911a91
+│   │   │   ├── 22f99bf82c7be7fc
+│   │   │   ├── 26da17addd99c207
+│   │   │   ├── 29db1d31c1315500
+│   │   │   ├── 2b7f066f773012f4
+│   │   │   ├── 2c9af0aee22fff27
+│   │   │   ├── 2cbeaf7cd1c1305a
+│   │   │   ├── 2eaf1914df5d583f
+│   │   │   ├── 2eafd6a7f60da82d
+│   │   │   ├── 2eca5b7a48b4573c
+│   │   │   ├── 2efbff69280f29f8
+│   │   │   ├── 3088190bfd7e456e
+│   │   │   ├── 3363d4ec2463d133
+│   │   │   ├── 3442c4c697c61234
+│   │   │   ├── 3569c534a284fd14
+│   │   │   ├── 3650865d59a228d4
+│   │   │   ├── 36b92158ad1d7995
+│   │   │   ├── 384c78e1268338a5
+│   │   │   ├── 3888c5ec37a1c9e2
+│   │   │   ├── 3a5de057e5820148
+│   │   │   ├── 3a795b7bb6780136
+│   │   │   ├── 3a8dbd12a3953aaf
+│   │   │   ├── 3b0509e86630a68a
+│   │   │   ├── 3f5b48bd48e7a7e4
+│   │   │   ├── 3f751d54cc17d046
+│   │   │   ├── 3ffc7428423ed6ec
+│   │   │   ├── 40b48aedf96b0a58
+│   │   │   ├── 431fe7c1160dd538
+│   │   │   ├── 44b79f774828aedb
+│   │   │   ├── 46e4751197a7cd14
+│   │   │   ├── 477f4559cd852f13
+│   │   │   ├── 4952293779752b29
+│   │   │   ├── 4a47a7358e5fc57e
+│   │   │   ├── 4ab2e3bb5e4a4453
+│   │   │   ├── 4b5c695e99dafe42
+│   │   │   ├── 4c14636023b00be7
+│   │   │   ├── 4d3fb1ca05469f12
+│   │   │   ├── 4ef920e0abea6147
+│   │   │   ├── 4f1211d2034a4a18
+│   │   │   ├── 4fa6a58fb074285d
+│   │   │   ├── 50c5fb6065a4a96a
+│   │   │   ├── 51ed1ad3a7ed9587
+│   │   │   ├── 5450a94ba8304f11
+│   │   │   ├── 5a7c524b02f98878
+│   │   │   ├── 5a8371ba98ae7695
+│   │   │   ├── 5aa71d1e0c9a43eb
+│   │   │   ├── 5b783926ab71d024
+│   │   │   ├── 5bd38a7e1056024b
+│   │   │   ├── 5d76a57fadea227a
+│   │   │   ├── 5daf7689bedfa9b2
+│   │   │   ├── 5debed8e672bfd6a
+│   │   │   ├── 5e29d139d9121210
+│   │   │   ├── 5e5b89363aa86517
+│   │   │   ├── 6066bb54abf502aa
+│   │   │   ├── 60dd41540598d98a
+│   │   │   ├── 610c31a92a4ed006
+│   │   │   ├── 611bf2066971f4e5
+│   │   │   ├── 61cede55917c8861
+│   │   │   ├── 627ed3584f6ad2bc
+│   │   │   ├── 65fb2f44fc123eac
+│   │   │   ├── 6630deb7cdfc29a8
+│   │   │   ├── 6671522a19633638
+│   │   │   ├── 66f369106dd819b0
+│   │   │   ├── 69d9a537000cfd22
+│   │   │   ├── 6a5b8b4a14f16f6e
+│   │   │   ├── 6dcfc776a8d032d4
+│   │   │   ├── 6eede9323daac536
+│   │   │   ├── 6face2f82013887f
+│   │   │   ├── 706f0b6f73d0bc04
+│   │   │   ├── 735208740e212ab5
+│   │   │   ├── 754db458dcb059f0
+│   │   │   ├── 7581a316f60a40c3
+│   │   │   ├── 76abaf4db04d6e1a
+│   │   │   ├── 773f9694578f34e6
+│   │   │   ├── 7dd01722bedcec82
+│   │   │   ├── 7e37ed7dc9361e43
+│   │   │   ├── 7ec123919856b0d1
+│   │   │   ├── 7f86bce7fb14a17b
+│   │   │   ├── 80b96189f7603949
+│   │   │   ├── 80f24b6dcc90ce67
+│   │   │   ├── 825ff1f46649128a
+│   │   │   ├── 8334b10f823eedac
+│   │   │   ├── 85b0818b2e6d7ee9
+│   │   │   ├── 866b1e62779a3d68
+│   │   │   ├── 883d6fa034e53e9c
+│   │   │   ├── 88fda7df39684729
+│   │   │   ├── 8b716f7db57bda50
+│   │   │   ├── 8b71aced8276ac06
+│   │   │   ├── 8b8610d6e5026ba8
+│   │   │   ├── 8c66e1b6a5de2de9
+│   │   │   ├── 8c942b25191143cf
+│   │   │   ├── 8df13b7bf85342b6
+│   │   │   ├── 8ef515d8ed567b33
+│   │   │   ├── 8f121d3410caa804
+│   │   │   ├── 8fc4b61612d07ff6
+│   │   │   ├── 9045402d8806de14
+│   │   │   ├── 9181e6a2f2c87efa
+│   │   │   ├── 9344a41f5bcebce5
+│   │   │   ├── 94bb628d704838b3
+│   │   │   ├── 95570ca29120cd07
+│   │   │   ├── 96ad8f05a2424730
+│   │   │   ├── 97ef2235d4d0ef27
+│   │   │   ├── 9c533525ee778651
+│   │   │   ├── 9c6bdf6bc888a601
+│   │   │   ├── 9cd01f79a86d3015
+│   │   │   ├── 9d9184a8fbfaf9f6
+│   │   │   ├── 9e1ebd3d6dab9bb6
+│   │   │   ├── 9e85ab97043e94ce
+│   │   │   ├── 9ee762878c300c28
+│   │   │   ├── 9f10b4389d72a3b8
+│   │   │   ├── a0935ce93d167371
+│   │   │   ├── a1294c0fa65b7cbb
+│   │   │   ├── a2589a370ace6945
+│   │   │   ├── a2c81e82e20f3885
+│   │   │   ├── a4a659bf04a65a4a
+│   │   │   ├── a72eb292fc828257
+│   │   │   ├── a7aa5cde320fd3fb
+│   │   │   ├── a80faa3a6fa98c52
+│   │   │   ├── a99f1ad9659fa1e3
+│   │   │   ├── a9c4ee9a2ddc4a8d
+│   │   │   ├── aa5a30cf540cc487
+│   │   │   ├── abaffa8079a55c4d
+│   │   │   ├── ae71db1fb3286a47
+│   │   │   ├── b024272cf0733c0c
+│   │   │   ├── b132328fa36d1715
+│   │   │   ├── b1b94a1a3c06c626
+│   │   │   ├── b246287607532193
+│   │   │   ├── b2c1dcc2a2aa406d
+│   │   │   ├── b368dac6cf1dde91
+│   │   │   ├── b3bf426337eb1fae
+│   │   │   ├── b4ff574f5d375ec7
+│   │   │   ├── b65033fba0af5bdc
+│   │   │   ├── b6b359813a77b9d5
+│   │   │   ├── b746127e15548354
+│   │   │   ├── b843b132c7be7243
+│   │   │   ├── bb70b79361c3301b
+│   │   │   ├── bce7d0048c284611
+│   │   │   ├── bdf380284da41ca7
+│   │   │   ├── c14119d4ad887c7c
+│   │   │   ├── c2771cec3380374b
+│   │   │   ├── c76605be197bd3ac
+│   │   │   ├── c7db38a52702c949
+│   │   │   ├── cb45d3ab57a6da0e
+│   │   │   ├── cb471d686777ec61
+│   │   │   ├── cbf03f3e30965855
+│   │   │   ├── cde445fb13158c0d
+│   │   │   ├── ce1a3b3d6ad0f2bc
+│   │   │   ├── d2a40bf6bc4f5b3d
+│   │   │   ├── d49a7c0277ff9f6e
+│   │   │   ├── d7fc4c44229a4dfc
+│   │   │   ├── d8e8313f079ffbc9
+│   │   │   ├── d9f1268d17781b98
+│   │   │   ├── db7d7103141743b2
+│   │   │   ├── de391ff73d1635e1
+│   │   │   ├── de48fb72f88f97ad
+│   │   │   ├── e08e297f26bcca64
+│   │   │   ├── e18d6ee6af0897ec
+│   │   │   ├── e251c48bd300a1df
+│   │   │   ├── e28e1b0d9290c4c5
+│   │   │   ├── e31d1a21360d9a6e
+│   │   │   ├── e37ea1098eb0cfe8
+│   │   │   ├── e3b9d68825cddd53
+│   │   │   ├── e5b1f43e8a748b42
+│   │   │   ├── e6376748ac1139cb
+│   │   │   ├── e63d9d0e613b6ee9
+│   │   │   ├── e669e44c0abe04fc
+│   │   │   ├── eaa5ee8b88170801
+│   │   │   ├── ec0790aad334c86d
+│   │   │   ├── ee4f28809d90a28b
+│   │   │   ├── f21a9aaf2d3a7e39
+│   │   │   ├── f24420202f5445f6
+│   │   │   ├── f3decab7fc5258f6
+│   │   │   ├── f6d7ad43e8500361
+│   │   │   ├── f731d6863a36b0f3
+│   │   │   ├── f75a06fa67c5d3e0
+│   │   │   ├── f8707d9b540d7a72
+│   │   │   ├── f98cb3ceab3925b0
+│   │   │   └── fa964bab819ed1c9
+│   │   ├── 8d7d2e2265799aed
+│   │   │   └── c7e51604148bbe03
+│   │   ├── abdd860676322665
+│   │   │   └── 6a2853236033216a
+│   │   ├── b5879bbb5656d192
+│   │   │   └── 327ebe8e2777678d
+│   │   ├── b81374e14337e5a9
+│   │   │   └── 3e40e0baa7431895
+│   │   ├── bd3692344a4997a2
+│   │   │   └── 03ebb74834d75cae
+│   │   ├── e2b863977d9db227
+│   │   │   └── 3e40e0baa7431895
+│   │   ├── edb8d059c77b8053
+│   │   │   ├── 01a765182ab80132
+│   │   │   ├── 1b65f7bff82dd7f7
+│   │   │   ├── 23568cfc3586a6f0
+│   │   │   ├── 343cffc05d9548ea
+│   │   │   ├── 365762880689136e
+│   │   │   ├── 3b5f59e5bcda390e
+│   │   │   ├── 61792675e870efcf
+│   │   │   ├── a901f9938a1208de
+│   │   │   ├── ddd2d164937862d5
+│   │   │   ├── e578dd3143654c00
+│   │   │   └── ff8e48c888f51987
+│   │   ├── ee5650b294ff5ff7
+│   │   │   ├── 036bc69c8709b65b
+│   │   │   ├── 1611b5ab49d2e1d0
+│   │   │   ├── 1ca35f1f5343bce7
+│   │   │   ├── 2d86ac41f6e05c08
+│   │   │   ├── 41305e5e106f5897
+│   │   │   ├── 45cb0279c8594c2e
+│   │   │   ├── 5ee81a89f295b94b
+│   │   │   ├── 9975bdcb41d1d2f6
+│   │   │   ├── 9c4e13ce0adfd292
+│   │   │   ├── ad32258211aa3967
+│   │   │   ├── b3a14c86e1b75556
+│   │   │   ├── b7ca7bea5ebbbb2b
+│   │   │   ├── bab4435f12a12408
+│   │   │   ├── bba5df51caf8beec
+│   │   │   ├── c13576271c095cc4
+│   │   │   ├── cc13a4ca45fb82a4
+│   │   │   ├── ed1139b331a594a4
+│   │   │   ├── f289a24d5a26a46f
+│   │   │   └── fd0699da77db168a
+│   │   ├── f800742e79f5e1f5
+│   │   │   ├── 3ada80d98481ca8b
+│   │   │   ├── 43ad4f0746d3440f
+│   │   │   ├── 6ce4b57052807fee
+│   │   │   ├── 73912b909e9459a1
+│   │   │   ├── 7896e3faf9eb1e58
+│   │   │   ├── 804618ee1b4011db
+│   │   │   ├── 8ddc9bd0a176b680
+│   │   │   └── a035983c34a6c6bb
+│   │   └── f8979b1f3048aeb9
+│   │       ├── 16ea0b84ab6b9dee
+│   │       ├── 1999f27ed2c98079
+│   │       ├── 25d69042b034fb05
+│   │       ├── 3e234ac8cdd51b50
+│   │       ├── 43876f66cec3bcae
+│   │       ├── 5ac9b715f60ed5a2
+│   │       ├── 5e872e97582782e7
+│   │       ├── b8169c9b0a3fb6fc
+│   │       ├── e3bd2681ac79a366
+│   │       ├── eb30caf4b3bd8087
+│   │       └── f685f511e18b6404
+│   └── unicode_data
+│       └── 13.0.0
+│           ├── charmap.json.gz
+│           └── codec-utf-8.json.gz
+├── .pytest_cache
+│   ├── v
+│   │   └── cache
+│   │       ├── lastfailed
+│   │       ├── nodeids
+│   │       └── stepwise
+│   ├── .gitignore
+│   ├── CACHEDIR.TAG
+│   └── README.md
+└── pkg
+    ├── subpkg
+    │   ├── __init__.py
+    │   └── module_b.py
+    ├── __init__.py
+    └── module_a.py
+
+        ## All Python files (with module paths)
+        - pkg/module_a.py  (module_path=pkg.module_a)
+- pkg/__init__.py  (module_path=pkg.__init__)
+- pkg/subpkg/module_b.py  (module_path=pkg.subpkg.module_b)
+- pkg/subpkg/__init__.py  (module_path=pkg.subpkg.__init__)
+
+        ## Target function (with module path metadata)
+        - module_path: `pkg.module_a.Encoder.encode`
+        - defined in file: `pkg/module_a.py`
+        - source code:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Your goals
+        1. Select **top 10 source files** that are most likely to contain:
+           - inverse operations (e.g. encode/decode, serialize/deserialize)
+           - validation or checking logic
+           - invariants / consistency checks
+           - higher-level orchestration that relies on the target function
+           - alternative implementations with the same behavior
+        2. For each selected file, explain **why** it is related from a property/testing perspective.
+        3. For each selected file, list notable **functions/classes/methods** (with module paths)
+           that might be important when generating PBTs.
+
+        ## Output format (MUST be valid JSON)
+        Return a JSON object with the following shape:
+
+        {
+          "target_function_module_path": "<string>",
+          "selected_files": [
+            {
+              "rel_path": "<relative/path/to/file.py>",
+              "module_path": "<python.module.path>",
+              "reason": "<why this file is related>",
+              "notable_symbols": [
+                {
+                  "name": "<symbol name>",
+                  "kind": "function|class|method",
+                  "module_path": "<python.module.path.for.this.symbol>",
+                  "role_for_pbt": "<how this helps define properties/invariants>"
+                }
+              ]
+            }
+          ]
+        }
+
+        Do not include any comments outside JSON. Do not use trailing commas.
+2025-12-07T23:07:31Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "selected_files": [
+    {
+      "rel_path": "pkg/module_a.py",
+      "module_path": "pkg.module_a",
+      "reason": "Contains the target function's class definition (Encoder). Likely contains related methods (e.g., decode, validate) or alternative encoders that share invariants.",
+      "notable_symbols": [
+        {
+          "name": "Encoder",
+          "kind": "class",
+          "module_path": "pkg.module_a.Encoder",
+          "role_for_pbt": "The class containing the target encode method. May define other methods (e.g., decode) for round-trip properties or shared state invariants."
+        },
+        {
+          "name": "encode",
+          "kind": "method",
+          "module_path": "pkg.module_a.Encoder.encode",
+          "role_for_pbt": "The target function itself. Properties can test idempotence (encode(encode(x)) == encode(x)) or consistency with other operations."
+        }
+      ]
+    },
+    {
+      "rel_path": "pkg/subpkg/module_b.py",
+      "module_path": "pkg.subpkg.module_b",
+      "reason": "May contain a Decoder class or inverse functions (e.g., decode, lower) that are natural opposites for round-trip property testing.",
+      "notable_symbols": [
+        {
+          "name": "Decoder",
+          "kind": "class",
+          "module_path": "pkg.subpkg.module_b.Decoder",
+          "role_for_pbt": "Potential inverse class for Encoder. Could provide decode method for encode(decode(x)) == x or decode(encode(x)) == x properties."
+        },
+        {
+          "name": "decode",
+          "kind": "function",
+          "module_path": "pkg.subpkg.module_b.decode",
+          "role_for_pbt": "Potential inverse function to encode. Enables round-trip property testing."
+        }
+      ]
+    },
+    {
+      "rel_path": "pkg/__init__.py",
+      "module_path": "pkg.__init__",
+      "reason": "May expose the Encoder class or related functions from the package level. Could define package-level constants or validation functions used by encode.",
+      "notable_symbols": [
+        {
+          "name": "Encoder",
+          "kind": "class",
+          "module_path": "pkg.Encoder",
+          "role_for_pbt": "If re-exported, it's the same as pkg.module_a.Encoder. Useful for import simplicity in tests."
+        },
+        {
+          "name": "VALID_CHARS",
+          "kind": "variable",
+          "module_path": "pkg.VALID_CHARS",
+          "role_for_pbt": "Potential constant defining valid input characters for encode. Can be used to generate valid input strings for property tests."
+        }
+      ]
+    },
+    {
+      "rel_path": "pkg/subpkg/__init__.py",
+      "module_path": "pkg.subpkg.__init__",
+      "reason": "May expose Decoder or related utilities from subpkg. Could define shared error types or validation helpers.",
+      "notable_symbols": [
+        {
+          "name": "Decoder",
+          "kind": "class",
+          "module_path": "pkg.subpkg.Decoder",
+          "role_for_pbt": "If re-exported, provides inverse for round-trip testing with pkg.module_a.Encoder."
+        },
+        {
+          "name": "ValidationError",
+          "kind": "class",
+          "module_path": "pkg.subpkg.ValidationError",
+          "role_for_pbt": "Potential exception raised by encode or decode on invalid input. Can be used to test error handling properties."
+        }
+      ]
+    }
+  ]
+}
+2025-12-07T23:07:31Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert in property-based testing for Python.
+        You are given:
+        - A target function (with module path metadata).
+        - The full source code of several **related files** picked by another agent.
+
+        Your job is to extract structured information that will help generate
+        high-quality **cross-function PBTs**.
+
+        ## STRICT REQUIREMENT ABOUT METADATA
+        - Every time you refer to a function/class/method, you MUST include its
+          full Python **module path** in the output.
+        - This metadata must be sufficient for importing in tests.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Related files (with source)
+        # File: pkg/module_a.py
+```python
+def add(x: int, y: int) -> int:
+    """Simple function to test function discovery."""
+    return x + y
+
+
+class Encoder:
+    """Class with a method to test method discovery."""
+
+    def encode(self, value: str) -> str:
+        return value.upper()
+
+
+
+```
+
+# File: pkg/subpkg/module_b.py
+```python
+def mul(x: int, y: int) -> int:
+    """Another simple function for discovery tests."""
+    return x * y
+
+
+
+```
+
+# File: pkg/__init__.py
+```python
+"""
+Example package for testing pbt_gen utilities.
+"""
+
+
+
+```
+
+# File: pkg/subpkg/__init__.py
+```python
+"""
+Subpackage for example project.
+"""
+
+
+
+```
+
+        ## Your goals
+        For the target function, infer:
+        - **Invariants**: properties that should always hold about inputs/outputs/state.
+        - **Preconditions**: assumptions that must hold for the function to behave correctly.
+        - **Postconditions**: guarantees about outputs or state after the function returns.
+        - **Cross-function relationships**: how this function interacts with other functions,
+          such as encode/decode pairs, round-trips, consistency with validators, etc.
+        - **Examples**: a few concrete input/output or usage examples that illustrate the above.
+
+        ## Output format (MUST be valid JSON)
+        Return a JSON object:
+
+        {
+          "target_function_module_path": "<string>",
+          "description": "<high-level description of the function's behavior and role>",
+          "invariants": ["<string>", "..."],
+          "preconditions": ["<string>", "..."],
+          "postconditions": ["<string>", "..."],
+          "relationships": [
+            {
+              "description": "<relation, e.g. encode/decode round-trip>",
+              "related_symbol_module_path": "<python.module.path>",
+              "kind": "function|class|method"
+            }
+          ],
+          "examples": ["<example 1>", "<example 2>", "..."]
+        }
+
+        Do not include any comments outside JSON. Do not use trailing commas.
+2025-12-07T23:07:40Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "description": "A method of the Encoder class that converts a given string to its uppercase representation.",
+  "invariants": ["The output string length equals the input string length.", "The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).", "For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2)."],
+  "preconditions": ["The input `value` must be a string."],
+  "postconditions": ["The returned string is the uppercase version of the input string `value`."],
+  "relationships": [],
+  "examples": ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]
+}
+2025-12-07T23:07:40Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are assisting with semantic vector search for Python source code
+in order to build cross-function property-based tests (PBT).
+
+## STRICT REQUIREMENT ABOUT METADATA
+- You must restate the target function's module path exactly, as this will be
+  stored as metadata for downstream steps.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Your goal
+Produce a **single natural-language query** that is well-suited for vector
+similarity search to find:
+- potential inverse/dual functions (e.g. encode/decode, serialize/deserialize)
+- callers and callees that impose stronger invariants
+- validators or checkers enforcing constraints related to this function
+- alternative implementations with same behavior
+
+The query should:
+- Be descriptive and self-contained (no references like "the function above").
+- Emphasize properties, invariants, and relationships over concrete variable names.
+
+## Output format (MUST be valid JSON)
+Return:
+
+{
+  "target_function_module_path": "<string>",
+  "retrieval_query": "<single natural language query>"
+}
+
+Do not include comments, only JSON.
+2025-12-07T23:07:45Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "retrieval_query": "Python function that transforms or encodes a string input, possibly to uppercase, with potential inverse operations like decode or to_lowercase, related validation functions for string format or case, callers that prepare or clean data before encoding, and alternative implementations performing similar case conversion or string serialization."
+}
+2025-12-07T23:07:46Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert in property-based testing for Python.
+        You are given:
+        - A target function.
+        - A semantic search query.
+        - A set of code/documentation snippets retrieved by vector search.
+
+        ## STRICT REQUIREMENT ABOUT METADATA
+        - Each time you reference a symbol from the retrieved snippets, you must include
+          its `module_path` metadata exactly as provided (or inferred if clearly implied).
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Retrieval query
+        Python function that transforms or encodes a string input, possibly to uppercase, with potential inverse operations like decode or to_lowercase, related validation functions for string format or case, callers that prepare or clean data before encoding, and alternative implementations performing similar case conversion or string serialization.
+
+        ## Retrieval hits
+        ### Hit 0
+- module_path: pkg.module_a.Encoder.encode
+- rel_path: pkg/module_a.py
+- metadata: {'module_path': 'pkg.module_a.Encoder.encode', 'rel_path': 'pkg/module_a.py'}
+```python
+    def encode(self, value: str) -> str:
+        return value.upper()
+```
+
+### Hit 1
+- module_path: pkg.subpkg.module_b.mul
+- rel_path: pkg/subpkg/module_b.py
+- metadata: {'module_path': 'pkg.subpkg.module_b.mul', 'rel_path': 'pkg/subpkg/module_b.py'}
+```python
+def mul(x: int, y: int) -> int:
+    """Another simple function for discovery tests."""
+    return x * y
+```
+
+### Hit 2
+- module_path: pkg.module_a.add
+- rel_path: pkg/module_a.py
+- metadata: {'module_path': 'pkg.module_a.add', 'rel_path': 'pkg/module_a.py'}
+```python
+def add(x: int, y: int) -> int:
+    """Simple function to test function discovery."""
+    return x + y
+```
+
+        ## Your goals
+        Similar to previous step, but based on retrieval hits:
+        - Infer invariants, preconditions, postconditions, cross-function relationships,
+          and concrete examples that are useful for generating PBTs.
+        - Especially focus on how the target function should behave **in relation to** the
+          retrieved symbols (round-trips, consistency, error handling, etc.).
+
+        ## Output format (MUST be valid JSON)
+
+        {
+          "target_function_module_path": "<string>",
+          "description": "<summary of new insights from retrieval>",
+          "invariants": ["<string>", "..."],
+          "preconditions": ["<string>", "..."],
+          "postconditions": ["<string>", "..."],
+          "relationships": [
+            {
+              "description": "<relation>",
+              "related_symbol_module_path": "<python.module.path>",
+              "kind": "function|class|method"
+            }
+          ],
+          "examples": ["<example 1>", "<example 2>", "..."]
+        }
+
+        Do not include comments, only JSON.
+2025-12-07T23:07:54Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+{
+  "target_function_module_path": "pkg.module_a.Encoder.encode",
+  "description": "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.",
+  "invariants": ["Output string length equals input string length.", "Output string is entirely uppercase.", "For any string s, encode(s) == encode(encode(s)) (idempotent).", "Encoding is pure and side-effect free."],
+  "preconditions": ["Input must be a string.", "Input should be non-null."],
+  "postconditions": ["Return value is a string.", "For all characters c in the output, c.isupper() or not c.isalpha() is true."],
+  "relationships": [],
+  "examples": ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]
+}
+2025-12-07T23:07:54Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: invariant
+- Property description: For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:07:59Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(s1=st.text(), s2=st.text())
+def test_encode_is_deterministic_for_equal_strings(s1, s2):
+    encoder = Encoder()
+    if s1 == s2:
+        assert encoder.encode(s1) == encoder.encode(s2)
+2025-12-07T23:08:03Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(s1=st.text(), s2=st.text())
+def test_encode_is_deterministic_for_equal_strings(s1, s2):
+    encoder = Encoder()
+    if s1 == s2:
+        assert encoder.encode(s1) == encoder.encode(s2)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_0
+tests/test_0_0.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 2.86/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:08:08Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(s1=st.text(), s2=st.text())
+def test_encode_is_deterministic_for_equal_strings(s1, s2):
+    encoder = Encoder()
+    if s1 == s2:
+        assert encoder.encode(s1) == encoder.encode(s2)
+2025-12-07T23:08:13Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(s1=st.text(), s2=st.text())
+def test_encode_is_deterministic_for_equal_strings(s1, s2):
+    encoder = Encoder()
+    if s1 == s2:
+        assert encoder.encode(s1) == encoder.encode(s2)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_0
+tests/test_0_0.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 2.86/10 (previous run: 2.86/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:08:18Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(s1=st.text(), s2=st.text())
+def test_encode_is_deterministic_for_equal_strings(s1, s2):
+    encoder = Encoder()
+    if s1 == s2:
+        assert encoder.encode(s1) == encoder.encode(s2)
+2025-12-07T23:08:24Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: invariant
+- Property description: Output string length equals input string length.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:08:27Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+2025-12-07T23:08:30Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: Output string length equals input string length.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_1
+tests/test_0_1.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 2.86/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:08:35Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+2025-12-07T23:08:39Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: Output string length equals input string length.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_1
+tests/test_0_1.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 2.86/10 (previous run: 2.86/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:08:44Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+2025-12-07T23:09:06Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: invariant
+- Property description: The output string length equals the input string length.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:09:11Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+2025-12-07T23:09:15Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: The output string length equals the input string length.
+
+        ## Original test code (with syntax errors)
+        ```python
+        from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_2
+tests/test_0_2.py:2:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 1.67/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:09:19Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+2025-12-07T23:09:23Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: The output string length equals the input string length.
+
+        ## Original test code (with syntax errors)
+        ```python
+        from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_2
+tests/test_0_2.py:2:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 1.67/10 (previous run: 1.67/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:09:26Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_length_equals_input_length(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert len(result) == len(value)
+2025-12-07T23:09:33Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: invariant
+- Property description: For any string s, encode(s) == encode(encode(s)) (idempotent).
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:09:37Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_is_idempotent(value):
+    encoder = Encoder()
+    first_encode = encoder.encode(value)
+    second_encode = encoder.encode(first_encode)
+    assert first_encode == second_encode
+2025-12-07T23:09:41Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: For any string s, encode(s) == encode(encode(s)) (idempotent).
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_is_idempotent(value):
+    encoder = Encoder()
+    first_encode = encoder.encode(value)
+    second_encode = encoder.encode(first_encode)
+    assert first_encode == second_encode
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_3
+tests/test_0_3.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 3.75/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:09:46Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_is_idempotent(value):
+    encoder = Encoder()
+    first_encode = encoder.encode(value)
+    second_encode = encoder.encode(first_encode)
+    assert first_encode == second_encode
+2025-12-07T23:09:50Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: For any string s, encode(s) == encode(encode(s)) (idempotent).
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_is_idempotent(value):
+    encoder = Encoder()
+    first_encode = encoder.encode(value)
+    second_encode = encoder.encode(first_encode)
+    assert first_encode == second_encode
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_3
+tests/test_0_3.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 3.75/10 (previous run: 3.75/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:09:54Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_is_idempotent(value):
+    encoder = Encoder()
+    first_encode = encoder.encode(value)
+    second_encode = encoder.encode(first_encode)
+    assert first_encode == second_encode
+2025-12-07T23:09:58Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: invariant
+- Property description: The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:10:04Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_output_contains_only_uppercase_or_original():
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for original_char, result_char in zip(value, result):
+        if original_char.isalpha():
+            assert result_char.isupper()
+        else:
+            assert result_char == original_char
+2025-12-07T23:10:08Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_output_contains_only_uppercase_or_original():
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for original_char, result_char in zip(value, result):
+        if original_char.isalpha():
+            assert result_char.isupper()
+        else:
+            assert result_char == original_char
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_4
+tests/test_0_4.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+tests/test_0_4.py:8:28: E0602: Undefined variable 'value' (undefined-variable)
+tests/test_0_4.py:9:42: E0602: Undefined variable 'value' (undefined-variable)
+
+-----------------------------------
+Your code has been rated at 0.00/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:10:13Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_output_contains_only_uppercase_or_original(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for original_char, result_char in zip(value, result):
+        if original_char.isalpha():
+            assert result_char.isupper()
+        else:
+            assert result_char == original_char
+2025-12-07T23:10:17Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_output_contains_only_uppercase_or_original(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for original_char, result_char in zip(value, result):
+        if original_char.isalpha():
+            assert result_char.isupper()
+        else:
+            assert result_char == original_char
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_4
+tests/test_0_4.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 5.00/10 (previous run: 0.00/10, +5.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:10:23Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_output_contains_only_uppercase_or_original(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for original_char, result_char in zip(value, result):
+        if original_char.isalpha():
+            assert result_char.isupper()
+        else:
+            assert result_char == original_char
+2025-12-07T23:10:32Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: invariant
+- Property description: Output string is entirely uppercase.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:10:38Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_is_entirely_uppercase(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result.isupper() or not any(c.isalpha() for c in result)
+2025-12-07T23:10:41Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: Output string is entirely uppercase.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_is_entirely_uppercase(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result.isupper() or not any(c.isalpha() for c in result)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_5
+tests/test_0_5.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 2.86/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:10:46Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_is_entirely_uppercase(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result.isupper() or not any(c.isalpha() for c in result)
+2025-12-07T23:10:51Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: Output string is entirely uppercase.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_is_entirely_uppercase(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result.isupper() or not any(c.isalpha() for c in result)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_5
+tests/test_0_5.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 2.86/10 (previous run: 2.86/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:10:56Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_is_entirely_uppercase(value: str) -> None:
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result.isupper() or not any(c.isalpha() for c in result)
+2025-12-07T23:11:01Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: invariant
+- Property description: Encoding is pure and side-effect free.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:11:06Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given, assume
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_is_pure_and_side_effect_free(value):
+    encoder = Encoder()
+    result1 = encoder.encode(value)
+    result2 = encoder.encode(value)
+    assert result1 == result2
+    assert result1 is not value
+    assert result2 is not value
+2025-12-07T23:11:10Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: Encoding is pure and side-effect free.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given, assume
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_is_pure_and_side_effect_free(value):
+    encoder = Encoder()
+    result1 = encoder.encode(value)
+    result2 = encoder.encode(value)
+    assert result1 == result2
+    assert result1 is not value
+    assert result2 is not value
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_6
+tests/test_0_6.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 5.00/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:11:15Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_is_pure_and_side_effect_free(value):
+    encoder = Encoder()
+    result1 = encoder.encode(value)
+    result2 = encoder.encode(value)
+    assert result1 == result2
+    assert result1 is not value
+    assert result2 is not value
+2025-12-07T23:11:20Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: invariant
+        - Property description: Encoding is pure and side-effect free.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_is_pure_and_side_effect_free(value):
+    encoder = Encoder()
+    result1 = encoder.encode(value)
+    result2 = encoder.encode(value)
+    assert result1 == result2
+    assert result1 is not value
+    assert result2 is not value
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_6
+tests/test_0_6.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 5.00/10 (previous run: 5.00/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:11:25Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_is_pure_and_side_effect_free(value):
+    encoder = Encoder()
+    result1 = encoder.encode(value)
+    result2 = encoder.encode(value)
+    assert result1 == result2
+    assert result1 is not value
+    assert result2 is not value
+2025-12-07T23:11:30Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: postcondition
+- Property description: For all characters c in the output, c.isupper() or not c.isalpha() is true.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:11:35Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_characters_uppercase_or_non_alpha(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for c in result:
+        assert c.isupper() or not c.isalpha()
+2025-12-07T23:11:38Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: postcondition
+        - Property description: For all characters c in the output, c.isupper() or not c.isalpha() is true.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_characters_uppercase_or_non_alpha(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for c in result:
+        assert c.isupper() or not c.isalpha()
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_7
+tests/test_0_7.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 3.75/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:11:43Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_characters_uppercase_or_non_alpha(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for c in result:
+        assert c.isupper() or not c.isalpha()
+2025-12-07T23:11:48Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: postcondition
+        - Property description: For all characters c in the output, c.isupper() or not c.isalpha() is true.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_characters_uppercase_or_non_alpha(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for c in result:
+        assert c.isupper() or not c.isalpha()
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_7
+tests/test_0_7.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 3.75/10 (previous run: 3.75/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:11:52Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_output_characters_uppercase_or_non_alpha(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    for c in result:
+        assert c.isupper() or not c.isalpha()
+2025-12-07T23:12:02Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: postcondition
+- Property description: Return value is a string.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:12:06Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:12:10Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: postcondition
+        - Property description: Return value is a string.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_8
+tests/test_0_8.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 2.86/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:12:14Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:12:18Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: postcondition
+        - Property description: Return value is a string.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_8
+tests/test_0_8.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 2.86/10 (previous run: 2.86/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:12:22Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:12:26Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: postcondition
+- Property description: The returned string is the uppercase version of the input string `value`.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:12:32Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_uppercase_version_of_input(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result == value.upper()
+2025-12-07T23:12:34Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: postcondition
+        - Property description: The returned string is the uppercase version of the input string `value`.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_uppercase_version_of_input(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result == value.upper()
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_9
+tests/test_0_9.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 2.86/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:12:38Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_uppercase_version_of_input(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result == value.upper()
+2025-12-07T23:12:42Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: postcondition
+        - Property description: The returned string is the uppercase version of the input string `value`.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_uppercase_version_of_input(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result == value.upper()
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_9
+tests/test_0_9.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 2.86/10 (previous run: 2.86/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:12:47Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given
+from pkg.module_a import Encoder
+
+@given(value=st.text())
+def test_encode_returns_uppercase_version_of_input(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert result == value.upper()
+2025-12-07T23:12:53Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: precondition
+- Property description: The input `value` must be a string.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:12:57Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:13:01Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: precondition
+        - Property description: The input `value` must be a string.
+
+        ## Original test code (with syntax errors)
+        ```python
+        from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_10
+tests/test_0_10.py:2:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 1.67/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:13:03Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:13:07Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: precondition
+        - Property description: The input `value` must be a string.
+
+        ## Original test code (with syntax errors)
+        ```python
+        from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_10
+tests/test_0_10.py:2:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 1.67/10 (previous run: 1.67/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:13:11Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:13:16Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: precondition
+- Property description: Input should be non-null.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:13:21Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given, assume
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_non_null(value):
+    encoder = Encoder()
+    assume(value is not None)
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:13:24Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: precondition
+        - Property description: Input should be non-null.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given, assume
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_non_null(value):
+    encoder = Encoder()
+    assume(value is not None)
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_11
+tests/test_0_11.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 3.75/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:13:31Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given, assume
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_non_null(value):
+    encoder = Encoder()
+    assume(value is not None)
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:13:33Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: precondition
+        - Property description: Input should be non-null.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import hypothesis.strategies as st
+from hypothesis import given, assume
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_non_null(value):
+    encoder = Encoder()
+    assume(value is not None)
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_11
+tests/test_0_11.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 3.75/10 (previous run: 3.75/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:13:37Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import hypothesis.strategies as st
+from hypothesis import given, assume
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_non_null(value):
+    encoder = Encoder()
+    assume(value is not None)
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:13:43Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are a senior Python engineer and a property-based testing expert.
+Your task is to generate **property-based tests (PBT)** for the given target
+function using Hypothesis, based on structured signals extracted from
+related files and retrieval hits.
+
+## STRICT REQUIREMENTS
+- All imports must use the given **module paths** exactly.
+- Do NOT invent module paths; only use what you are given.
+- The tests must be valid Python code and runnable with pytest + hypothesis.
+
+## Target function
+- module_path: `pkg.module_a.Encoder.encode`
+- file: `pkg/module_a.py`
+- source:
+```python
+    def encode(self, value: str) -> str:
+return value.upper()
+```
+
+## Signals from related files 
+```json
+{'description': 'A method of the Encoder class that converts a given string to its uppercase representation.', 'invariants': ['The output string length equals the input string length.', 'The output string contains only uppercase characters (or the original character if it has no uppercase equivalent).', 'For any two input strings s1 and s2, if s1 == s2 then encode(s1) == encode(s2).'], 'preconditions': ['The input `value` must be a string.'], 'postconditions': ['The returned string is the uppercase version of the input string `value`.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''"]}
+```
+
+## Signals from retrieval hits 
+```json
+{'description': "Retrieval confirms the target function is a simple uppercase encoder. No inverse or related validation functions were found in the hits, suggesting the module may contain unrelated utilities. The primary insight is the function's deterministic, pure nature.", 'invariants': ['Output string length equals input string length.', 'Output string is entirely uppercase.', 'For any string s, encode(s) == encode(encode(s)) (idempotent).', 'Encoding is pure and side-effect free.'], 'preconditions': ['Input must be a string.', 'Input should be non-null.'], 'postconditions': ['Return value is a string.', 'For all characters c in the output, c.isupper() or not c.isalpha() is true.'], 'relationships': [], 'examples': ["encode('hello') -> 'HELLO'", "encode('123') -> '123'", "encode('') -> ''", "encode('HeLlO WoRlD') -> 'HELLO WORLD'"]}
+```
+
+## CRITICAL: Generate ONLY ONE test function
+You must generate **exactly ONE property-based test function** for the following specific property:
+- Property type: precondition
+- Property description: Input must be a string.
+
+IMPORTANT:
+- Do NOT generate multiple tests. Generate only one test function (e.g., `def test_...`).
+- Do NOT generate class definitions or setup methods. Only generate the test function itself.
+- The test function will be merged with other tests later, so focus only on the single test function.
+
+## Your goals
+- Use Hypothesis (and optionally pytest) to encode the discovered invariants,
+  preconditions, postconditions, and cross-function relationships.
+- Prefer **round-trip properties** (e.g. decode(encode(x)) == x) when applicable.
+- Include negative tests where appropriate (violating preconditions).
+- Generate exactly ONE test function for the specified property above.
+
+## Output format
+Return **only** the Python test code (a single test function), no backticks, no explanations.
+The output should be a single test function definition, not a complete test module.
+2025-12-07T23:13:47Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import pytest
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:13:51Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: precondition
+        - Property description: Input must be a string.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import pytest
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_12
+tests/test_0_12.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+-----------------------------------
+Your code has been rated at 2.86/10
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:13:56Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import pytest
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+2025-12-07T23:14:01Z [INFO] LLM REQUEST model=deepseek-chat
+PROMPT:
+You are an expert Python engineer and testing specialist.
+        A property-based test was generated but has **pylint syntax errors**.
+        Your task is to fix the syntax errors in the test code.
+
+        ## Target function
+        - module_path: `pkg.module_a.Encoder.encode`
+        - file: `pkg/module_a.py`
+        - source:
+        ```python
+            def encode(self, value: str) -> str:
+        return value.upper()
+        ```
+
+        ## Property being tested
+        - Property type: precondition
+        - Property description: Input must be a string.
+
+        ## Original test code (with syntax errors)
+        ```python
+        import pytest
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)
+        ```
+
+        ## Pylint error output
+        ```
+        ************* Module test_0_12
+tests/test_0_12.py:3:0: E0401: Unable to import 'pkg.module_a' (import-error)
+
+------------------------------------------------------------------
+Your code has been rated at 2.86/10 (previous run: 2.86/10, +0.00)
+
+
+
+        ```
+
+        ## Your task
+        Fix the syntax errors in the test code:
+        1. Fix all syntax errors reported by pylint
+        2. Ensure all imports are correct and use the exact module paths
+        3. Ensure the code is valid Python syntax
+        4. Maintain the test logic and property being tested
+        5. Ensure the test is runnable with pytest + hypothesis
+
+        ## Output format
+        Return **only** the corrected Python test code (a single test function), no backticks, no explanations.
+        The output should be a single test function definition, not a complete test module.
+2025-12-07T23:14:05Z [INFO] LLM RESPONSE model=deepseek-chat
+RESPONSE:
+import pytest
+from hypothesis import given, strategies as st
+from pkg.module_a import Encoder
+
+@given(st.text())
+def test_encode_input_must_be_string(value):
+    encoder = Encoder()
+    result = encoder.encode(value)
+    assert isinstance(result, str)

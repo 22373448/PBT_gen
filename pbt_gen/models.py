@@ -62,5 +62,4 @@ class GeneratedPBT:
     test_module_path: str
     test_code: str
     pylint_output: str | None = None
-
-
+    passed: bool = False
